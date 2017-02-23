@@ -1,0 +1,5 @@
+build/*
+devel/*
+install/*
+.metadata/*
+src/lasrobot_moveit_generated/default_mongo_db/*

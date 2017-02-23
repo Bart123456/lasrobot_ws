@@ -1,0 +1,10 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: kuka_description
+    relative_path: urdf/kuka_kr5_arc.urdf
+  SRDF:
+    relative_path: config/kuka_kr5_arc.srdf
+  CONFIG:
+    author_name: Bart en Giel
+    author_email: bart.moyaers@student.uhasselt.be
+    generated_timestamp: 1487253071

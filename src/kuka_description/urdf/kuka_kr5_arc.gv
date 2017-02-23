@@ -1,0 +1,29 @@
+digraph G {
+node [shape=box];
+"odom_combined" [label="odom_combined"];
+"Base" [label="Base"];
+"Link1" [label="Link1"];
+"Link2" [label="Link2"];
+"Link3" [label="Link3"];
+"Link4" [label="Link4"];
+"Link5" [label="Link5"];
+"Link6" [label="Link6"];
+"Link7" [label="Link7"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"odom_combined" -> "fixed" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"fixed" -> "Base"
+"Base" -> "joint1" [label="xyz: 0 0 0.225 \nrpy: 0 -0 0"]
+"joint1" -> "Link1"
+"Link1" -> "joint2" [label="xyz: 0.18 0 0.175 \nrpy: 0 -0 0"]
+"joint2" -> "Link2"
+"Link2" -> "joint3" [label="xyz: 0 0 0.6 \nrpy: 0 -0 0"]
+"joint3" -> "Link3"
+"Link3" -> "joint4" [label="xyz: 0.4035 0 0.12 \nrpy: 0 -0 0"]
+"joint4" -> "Link4"
+"Link4" -> "joint5" [label="xyz: 0.2165 0 0 \nrpy: 0 -0 0"]
+"joint5" -> "Link5"
+"Link5" -> "joint6" [label="xyz: 0.1088 0 0 \nrpy: 0 -0 0"]
+"joint6" -> "Link6"
+"Link6" -> "joint7" [label="xyz: 0.326 0 0.034 \nrpy: 0 -0 3.14"]
+"joint7" -> "Link7"
+}
