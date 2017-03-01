@@ -113,7 +113,7 @@ int main(int argc, char** argv)
   }
   
   int size = markerVec.size();
-  //Convert vector to array so we can publish it as a MarkerArray type.
+  //Copy vector to array so we can publish it as a MarkerArray type.
   visualization_msgs::MarkerArray ma;
   ma.markers.resize(size);
   for(int i = 0;i < size;i++)
@@ -121,23 +121,23 @@ int main(int argc, char** argv)
     ma.markers[i] = markerVec[i];
   }
   
+  //Wait for subscriber and publish the markerArray once the subscriber is found.
   ros::Rate loop_rate(10);
   ROS_INFO("Waiting for subscribers.");
   if(waitForSubscribers(vis_pub, ros::Duration(2.0)))
   {
-  ROS_INFO("Subscriber found, publishing markers.");
-    while(true){
-      vis_pub.publish(ma);
-	    ros::spinOnce();
-	    loop_rate.sleep();
-	  }
+  	ROS_INFO("Subscriber found, publishing markers.");
+  	vis_pub.publish(ma);
+	ros::spinOnce();
+	loop_rate.sleep();
   } else {
     ROS_ERROR("No subscribers connected, markers not published");
   }
 
   // 2. Create a robot model and initialize it
-  
   descartes_core::RobotModelPtr model (new descartes_moveit::MoveitStateAdapter);
+  
+  //Enable collision checking
   model->setCheckCollisions(true);
 
   // Name of description on parameter server. Typically just "robot_description".
@@ -314,7 +314,7 @@ Eigen::Quaternion<float> eulerToQuat(float rotX, float rotY, float rotZ)
 	return quat;
 }
   
-//Define function for easy marker publishing (combines adding poses to the "points" array and publishing them)
+//Creates pose that can be added to the TrajectoryVec vector.
 descartes_core::TrajectoryPtPtr addPose(float transX, float transY, float transZ, float rotX, float rotY, float rotZ)
 {
 	//Define the pose
@@ -333,7 +333,7 @@ descartes_core::TrajectoryPtPtr addPose(float transX, float transY, float transZ
 visualization_msgs::Marker createMarker(float transX, float transY, float transZ, float rotX, float rotY, float rotZ)
 {
 	static int count;
-  visualization_msgs::Marker marker;
+  	visualization_msgs::Marker marker;
 	marker.header.frame_id = "odom_combined";
 	marker.header.stamp = ros::Time();
 	marker.ns = "my_namespace";
