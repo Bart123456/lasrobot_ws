@@ -4,7 +4,10 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Global Options1
         - /Axes2
+        - /MarkerArray1
+        - /MarkerArray1/Status1
       Splitter Ratio: 0.74256
     Tree Height: 525
   - Class: rviz/Help
@@ -219,7 +222,15 @@ Visualization Manager:
       Length: 0.3
       Name: Axes
       Radius: 0.01
-      Reference Frame: <Fixed Frame>
+      Reference Frame: odom_combined
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /visualization_marker_array
+      Name: MarkerArray
+      Namespaces:
+        my_namespace: true
+      Queue Size: 100
       Value: true
   Enabled: true
   Global Options:
@@ -236,22 +247,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/XYOrbit
-      Distance: 2.63692
+      Distance: 2.71047
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.213386
-        Y: 0.404504
-        Z: 7.00355e-07
+        X: 0.211882
+        Y: 0.252024
+        Z: 2.5481e-06
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.399797
+      Pitch: 0.509797
       Target Frame: odom_combined
       Value: XYOrbit (rviz)
-      Yaw: 6.11496
+      Yaw: 5.91315
     Saved: ~
 Window Geometry:
   Displays:

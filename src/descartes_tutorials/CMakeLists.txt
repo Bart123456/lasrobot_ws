@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   descartes_trajectory
   descartes_planner
   trajectory_msgs
+  visualization_msgs
 )
 
 catkin_package()

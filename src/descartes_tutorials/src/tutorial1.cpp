@@ -13,7 +13,10 @@
 // Includes the planner we will be using
 #include <descartes_planner/dense_planner.h>
 //Include Eigen geometry header for rotations
-//#include </usr/include/eigen3/Eigen/Geometry>
+#include </usr/include/eigen3/Eigen/Geometry>
+//Include visualization markers for RViz
+#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 
 typedef std::vector<descartes_core::TrajectoryPtPtr> TrajectoryVec;
 typedef TrajectoryVec::const_iterator TrajectoryIter;
@@ -39,6 +42,22 @@ toROSJointTrajectory(const TrajectoryVec& trajectory, const descartes_core::Robo
  */
 bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory);
 
+//Function for easily defining poses
+Eigen::Affine3f definePose(float transX, float transY, float transZ, float rotX, float rotY, float rotZ);
+  
+//Function for constructing quaternion starting from Euler rotations XYZ
+Eigen::Quaternion<float> eulerToQuat(float rotX, float rotY, float rotZ);
+  
+//Creates pose that can be added to the TrajectoryVec vector.
+descartes_core::TrajectoryPtPtr addPose(float transX, float transY, float transZ, float rotX, float rotY, float rotZ);
+
+//Define function for easy marker creation
+visualization_msgs::Marker createMarker(float transX, float transY, float transZ, float rotX, float rotY, float rotZ);
+
+//Waits for a subscriber to subscribe to a publisher
+//Used to wait for RViz to subscribe to the Marker topic before publishing them
+bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
+
 int main(int argc, char** argv)
 {
   // Initialize ROS
@@ -49,7 +68,7 @@ int main(int argc, char** argv)
   ros::AsyncSpinner spinner (1);
   spinner.start();
 
-  // 1. Define sequence of points
+  
   /*
   	Eigen::Affine3d pose;
 	pose = Eigen::Translation3d(0, 0, 1);
@@ -61,38 +80,59 @@ int main(int argc, char** argv)
 
 	pose.linear() = m;
   */
+  
+  // 1. Define sequence of points
   TrajectoryVec points;
+  visualization_msgs::Marker marker;
+  std::vector<visualization_msgs::Marker> markerVec;
+
+  //Start the publisher for the Rviz Markers
+  ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 1 );
+  
   for (unsigned int i = 0; i < 10; ++i)
   {
-    Eigen::Affine3d pose;
-    pose = Eigen::Translation3d(0.6, 0.3, 0.2 + 0.05 * i);
-    descartes_core::TrajectoryPtPtr pt = makeTolerancedCartesianPoint(pose);
-    points.push_back(pt);
+  	marker = createMarker(0.6, 0.3, 0.2 + 0.05 * i, 0, 0, 0);
+  	markerVec.push_back(marker);
+    points.push_back(addPose(0.6, 0.3, 0.2 + 0.05 * i, 0, 0, 0));
   }
 
   for (unsigned int i = 0; i < 10; ++i)
   {
-    Eigen::Affine3d pose;
-    pose = Eigen::Translation3d(0.6, 0.3 + 0.04 * i, 0.7);
-    descartes_core::TrajectoryPtPtr pt = makeTolerancedCartesianPoint(pose);
-    points.push_back(pt);
+  	marker = createMarker(0.6, 0.3 + 0.04 * i, 0.7, 0, 0, 0);
+  	markerVec.push_back(marker);
+    points.push_back(addPose(0.6, 0.3 + 0.04 * i, 0.7, 0, 0, 0));
   }
   
-for (unsigned int i = 0; i < 9; ++i)
+  for (unsigned int i = 0; i < 9; ++i)
   {
-    Eigen::Affine3d pose;
     //toFrame() functie uit descartes_core/include/utils.h
-    pose = descartes_core::utils::toFrame(0.6, 0.7, 0.7, 0.0, 0.0, 0.1 * i, 1);
-
-	/*Eigen::Matrix3d m;
-		m = Eigen::AngleAxisd(0.1 * i, Eigen::Vector3d::UnitZ())
-    	* Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY())
-    	* Eigen::AngleAxisd(0, Eigen::Vector3d::UnitZ());
-
-	pose.linear() = m;*/
-    
-    descartes_core::TrajectoryPtPtr pt = makeTolerancedCartesianPoint(pose);
-    points.push_back(pt);
+    //pose = descartes_core::utils::toFrame(0.6, 0.7, 0.7, 0.0, 0.0, 0.1 * i, 1);
+    marker = createMarker(0.6, 0.7, 0.7, 0.0, 0.0, 0.1 * i);
+  	markerVec.push_back(marker);
+	  points.push_back(addPose(0.6, 0.7, 0.7, 0.0, 0.0, 0.1 * i));
+  }
+  
+  int size = markerVec.size();
+  //Convert vector to array so we can publish it as a MarkerArray type.
+  visualization_msgs::MarkerArray ma;
+  ma.markers.resize(size);
+  for(int i = 0;i < size;i++)
+  {
+    ma.markers[i] = markerVec[i];
+  }
+  
+  ros::Rate loop_rate(10);
+  ROS_INFO("Waiting for subscribers.");
+  if(waitForSubscribers(vis_pub, ros::Duration(2.0)))
+  {
+  ROS_INFO("Subscriber found, publishing markers.");
+    while(true){
+      vis_pub.publish(ma);
+	    ros::spinOnce();
+	    loop_rate.sleep();
+	  }
+  } else {
+    ROS_ERROR("No subscribers connected, markers not published");
   }
 
   // 2. Create a robot model and initialize it
@@ -154,6 +194,7 @@ for (unsigned int i = 0; i < 9; ++i)
   }
 
   // Wait till user kills the process (Control-C)
+  
   ROS_INFO("Done!");
   return 0;
 }
@@ -239,4 +280,102 @@ bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory)
     ROS_WARN("Action server could not execute trajectory");
     return false;
   }
+}
+
+//Function for easily defining poses
+Eigen::Affine3f definePose(float transX, float transY, float transZ, float rotX, float rotY, float rotZ)
+{
+  	Eigen::Matrix3f m;
+	m = Eigen::AngleAxisf(rotX, Eigen::Vector3f::UnitX())
+	  * Eigen::AngleAxisf(rotY, Eigen::Vector3f::UnitY())
+	  * Eigen::AngleAxisf(rotZ, Eigen::Vector3f::UnitZ());
+	
+	Eigen::Affine3f pose;
+	pose = Eigen::Translation3f(transX, transY, transZ);
+	pose.linear() = m;
+	
+	return pose;
+	
+}
+  
+//Function for constructing quaternion starting from Euler rotations XYZ
+Eigen::Quaternion<float> eulerToQuat(float rotX, float rotY, float rotZ)
+{
+  	Eigen::Matrix3f m;
+	m = Eigen::AngleAxisf(rotX, Eigen::Vector3f::UnitX())
+	  * Eigen::AngleAxisf(rotY, Eigen::Vector3f::UnitY())
+	  * Eigen::AngleAxisf(rotZ, Eigen::Vector3f::UnitZ());
+	
+	Eigen::AngleAxis<float> aa;
+	aa = Eigen::AngleAxisf(m);
+	
+	Eigen::Quaternion<float> quat;
+	quat = Eigen::Quaternion<float>(aa);
+	return quat;
+}
+  
+//Define function for easy marker publishing (combines adding poses to the "points" array and publishing them)
+descartes_core::TrajectoryPtPtr addPose(float transX, float transY, float transZ, float rotX, float rotY, float rotZ)
+{
+	//Define the pose
+	Eigen::Affine3f pose;
+	pose = definePose(transX, transY, transZ, rotX, rotY, rotZ);
+	
+	//Convert Affine3f to Affine3d
+	Eigen::Affine3d pose_d = pose.cast<double>();
+	
+	//Convert to axialsymmetric point
+	descartes_core::TrajectoryPtPtr pt = makeTolerancedCartesianPoint(pose_d); 
+	return pt;
+}
+
+//Define function for easy marker creation
+visualization_msgs::Marker createMarker(float transX, float transY, float transZ, float rotX, float rotY, float rotZ)
+{
+	static int count;
+  visualization_msgs::Marker marker;
+	marker.header.frame_id = "odom_combined";
+	marker.header.stamp = ros::Time();
+	marker.ns = "my_namespace";
+	marker.id = count;
+	marker.type = visualization_msgs::Marker::ARROW;
+	marker.action = visualization_msgs::Marker::ADD;
+	marker.lifetime = ros::Duration(0);
+	
+	marker.pose.position.x = transX;
+	marker.pose.position.y = transY;
+	marker.pose.position.z = transZ;
+	
+	//To calculate the quaternion values we first define an AngleAxis object using Euler rotations, then convert it
+	Eigen::Quaternion<float> quat;
+	quat = eulerToQuat(rotX, rotY, rotZ);
+	
+	marker.pose.orientation.x = quat.x();
+	marker.pose.orientation.y = quat.y();
+	marker.pose.orientation.z = quat.z();
+	marker.pose.orientation.w = quat.w();
+	marker.scale.x = 0.1;
+	marker.scale.y = 0.01;
+	marker.scale.z = 0.01;
+	marker.color.a = 1.0;	//Alpha
+	marker.color.r = 1.0;
+	marker.color.g = 0.0;
+	marker.color.b = 0.0;
+	count++;
+	return marker;
+}
+
+//Waits for a subscriber to subscribe to a publisher
+bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout)
+{
+    if(pub.getNumSubscribers() > 0)
+        return true;
+    ros::Time start = ros::Time::now();
+    ros::Rate waitTime(0.5);
+    while(ros::Time::now() - start < timeout) {
+        waitTime.sleep();
+        if(pub.getNumSubscribers() > 0)
+            break;
+    }
+    return pub.getNumSubscribers() > 0;
 }
