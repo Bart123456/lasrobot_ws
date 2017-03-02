@@ -186,12 +186,13 @@ int main(int argc, char** argv)
   trajectory_msgs::JointTrajectory joint_solution = toROSJointTrajectory(result, *model, names, 1.0);
 
   // 6. Send the ROS trajectory to the robot for execution
-
-  if (!executeTrajectory(joint_solution))
-  {
-    ROS_ERROR("Could not execute trajectory!");
-    return -4;
-  }
+	while(ros::ok()) {
+		if (!executeTrajectory(joint_solution))
+		{
+		  ROS_ERROR("Could not execute trajectory!");
+		  return -4;
+		}
+	}
 
   // Wait till user kills the process (Control-C)
   
