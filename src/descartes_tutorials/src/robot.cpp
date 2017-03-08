@@ -70,7 +70,7 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 int main(int argc, char** argv)
 {
   // Initialize ROS
-  ros::init(argc, argv, "descartes_tutorial");
+  ros::init(argc, argv, "robot");
   ros::NodeHandle nh;
 
   // Required for communication with moveit components
@@ -87,9 +87,16 @@ int main(int argc, char** argv)
   
   for (unsigned int i = 0; i < 10; ++i)
   {
-  	marker = createMarker(0.6, 0.3, 0.6, 0, 0, 0.1*i);
+  	marker = createMarker(0.8, 0.3, 0.6 + i * 0.01, 0, M_PI / 2, 0);
   	markerVec.push_back(marker);
-    points.push_back(addPose(0.6, 0.3, 0.6, 0, 0, 0.1*i, false));
+    points.push_back(addPose(0.8, 0.3, 0.6 + i * 0.01, 0, M_PI / 2, 0, true));
+  }
+  
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+  	marker = createMarker(0.8, 0.3, 0.7, 0, (M_PI / 2) + i * 0.1, 0);
+  	markerVec.push_back(marker);
+    points.push_back(addPose(0.8, 0.3, 0.7, 0, (M_PI / 2) + i * 0.1, 0, true));
   }
   
   int size = markerVec.size();
@@ -124,13 +131,13 @@ int main(int argc, char** argv)
   const std::string robot_description = "robot_description";
 
   // name of the kinematic group you defined when running MoveitSetupAssistant
-  const std::string group_name = "robot_arm";
+  const std::string group_name = "robotarm";
 
   // Name of frame in which you are expressing poses. Typically "world_frame" or "base_link".
-  const std::string world_frame = "odom_combined";
+  const std::string world_frame = "base_link";
 
   // tool center point frame (name of link associated with tool)
-  const std::string tcp_frame = "Link8";
+  const std::string tcp_frame = "endpoint";
 
   if (!model->initialize(robot_description, group_name, world_frame, tcp_frame))
   {
@@ -206,7 +213,7 @@ descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, dou
 	descartes_trajectory::PositionTolerance p;
 	p = ToleranceBase::zeroTolerance<PositionTolerance>(transX, transY, transZ);
 	descartes_trajectory::OrientationTolerance o;
-	o = ToleranceBase::createSymmetric<OrientationTolerance>(rotX, rotY, rotZ, 2*M_PI, 0, 0);
+	o = ToleranceBase::createSymmetric<OrientationTolerance>(rotX, rotY, rotZ, 0, 0, 2*M_PI);
 	return TrajectoryPtPtr( new CartTrajectoryPt( TolerancedFrame(pose, p, o), 0.0, M_PI/12) );
 }
 
@@ -214,7 +221,7 @@ descartes_core::TrajectoryPtPtr makeAxialSymmetricPoint(double x, double y, doub
 {
   using namespace descartes_core;
   using namespace descartes_trajectory;
-  return TrajectoryPtPtr( new AxialSymmetricPt(x, y, z, rx, ry, rz, M_PI/12, AxialSymmetricPt::X_AXIS) );
+  return TrajectoryPtPtr( new AxialSymmetricPt(x, y, z, rx, ry, rz, M_PI/12, AxialSymmetricPt::Z_AXIS) );
 }
 
 trajectory_msgs::JointTrajectory
@@ -340,7 +347,7 @@ visualization_msgs::Marker createMarker(double transX, double transY, double tra
 {
 	static int count;
   visualization_msgs::Marker marker;
-	marker.header.frame_id = "odom_combined";
+	marker.header.frame_id = "base_link";
 	marker.header.stamp = ros::Time();
 	marker.ns = "my_namespace";
 	marker.id = count;

@@ -24,7 +24,9 @@ typedef TrajectoryVec::const_iterator TrajectoryIter;
 /**
  * Generates a toleranced cartesian point from a pose
  */
-descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(const Eigen::Affine3d& pose);
+descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(const Eigen::Affine3d& pose); //NOT WORKING
+
+//Works
 descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, 
 																double transY, 
 																double transZ, 
@@ -186,7 +188,7 @@ descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(const Eigen::Affine
 	Eigen::Vector3d vector;
 	vector = pose.translation();
 	
-	//Test using tolerances
+	//Test using tolerances NOT WORKING CORRECTLY
 	descartes_trajectory::PositionTolerance p;
 	p = descartes_trajectory::PositionTolerance(vector(0), vector(0), vector(1), vector(1), vector(2), vector(2));
 	descartes_trajectory::OrientationTolerance o;
