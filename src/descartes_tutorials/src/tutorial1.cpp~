@@ -22,13 +22,20 @@ typedef std::vector<descartes_core::TrajectoryPtPtr> TrajectoryVec;
 typedef TrajectoryVec::const_iterator TrajectoryIter;
 
 /**
- * Generates an completely defined (zero-tolerance) cartesian point from a pose
+ * Generates a toleranced cartesian point from a pose
  */
-descartes_core::TrajectoryPtPtr makeCartesianPoint(const Eigen::Affine3d& pose);
+descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(const Eigen::Affine3d& pose);
+descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, 
+																double transY, 
+																double transZ, 
+																double rotX, 
+																double rotY, 
+																double rotZ);
+
 /**
  * Generates a cartesian point with free rotation about the Z axis of the EFF frame
  */
-descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(const Eigen::Affine3d& pose);
+descartes_core::TrajectoryPtPtr makeAxialSymmetricPoint(const Eigen::Affine3d& pose);
 
 /**
  * Translates a descartes trajectory to a ROS joint trajectory
@@ -171,7 +178,7 @@ int main(int argc, char** argv)
   return 0;
 }
 
-descartes_core::TrajectoryPtPtr makeCartesianPoint(const Eigen::Affine3d& pose)
+descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(const Eigen::Affine3d& pose)
 {
   using namespace descartes_core;
   using namespace descartes_trajectory;
@@ -184,10 +191,24 @@ descartes_core::TrajectoryPtPtr makeCartesianPoint(const Eigen::Affine3d& pose)
 	p = descartes_trajectory::PositionTolerance(vector(0), vector(0), vector(1), vector(1), vector(2), vector(2));
 	descartes_trajectory::OrientationTolerance o;
 	o = descartes_trajectory::OrientationTolerance(-M_PI, M_PI, 0, 0, 0, 0);
-  return TrajectoryPtPtr( new CartTrajectoryPt( TolerancedFrame(pose, p, o), 0, M_PI/12) );
+	return TrajectoryPtPtr( new CartTrajectoryPt( TolerancedFrame(pose, p, o), 0.0, M_PI/12) );
 }
 
-descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(double x, double y, double z, double rx, double ry, double rz)
+descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, double transY, double transZ, double rotX, double rotY, 																	double rotZ)
+{
+	using namespace descartes_core;
+	using namespace descartes_trajectory;
+	Eigen::Affine3d pose = utils::toFrame(transX, transY, transZ, rotX, rotY, rotZ, utils::EulerConventions::XYZ);
+	
+	//Test using tolerances
+	descartes_trajectory::PositionTolerance p;
+	p = ToleranceBase::zeroTolerance<PositionTolerance>(transX, transY, transZ);
+	descartes_trajectory::OrientationTolerance o;
+	o = ToleranceBase::createSymmetric<OrientationTolerance>(rotX, rotY, rotZ, 2*M_PI, 0, 0);
+	return TrajectoryPtPtr( new CartTrajectoryPt( TolerancedFrame(pose, p, o), 0.0, M_PI/12) );
+}
+
+descartes_core::TrajectoryPtPtr makeAxialSymmetricPoint(double x, double y, double z, double rx, double ry, double rz)
 {
   using namespace descartes_core;
   using namespace descartes_trajectory;
@@ -305,10 +326,9 @@ descartes_core::TrajectoryPtPtr addPose(double transX, double transY, double tra
 	descartes_core::TrajectoryPtPtr pt;
 	if(symmetric){
 		//Convert to axialsymmetric point
-		pt = makeTolerancedCartesianPoint(transX, transY, transZ, rotX, rotY, rotZ); 
+		pt = makeAxialSymmetricPoint(transX, transY, transZ, rotX, rotY, rotZ); 
 	} else {
-		pose = definePose(transX, transY, transZ, rotX, rotY, rotZ);
-		pt = makeCartesianPoint(pose);
+		pt = makeTolerancedCartesianPoint(transX, transY, transZ, rotX, rotY, rotZ);
 	}
 	return pt;
 }
