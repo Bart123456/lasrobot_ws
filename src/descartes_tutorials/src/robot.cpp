@@ -84,10 +84,10 @@ int main(int argc, char** argv)
   ROS_INFO("Waiting for subscribers.");
   if(waitForSubscribers(vis_pub, ros::Duration(2.0)))
   {
-  	ROS_INFO("Subscriber found, publishing markers.");
-  	vis_pub.publish(ma);
-		ros::spinOnce();
-		loop_rate.sleep();
+	ROS_INFO("Subscriber found, publishing markers.");
+	vis_pub.publish(ma);
+	ros::spinOnce();
+	loop_rate.sleep();
   } else {
     ROS_ERROR("No subscribers connected, markers not published");
   }
