@@ -7,37 +7,17 @@
 
 // Includes the descartes robot model we will be using
 #include <descartes_moveit/moveit_state_adapter.h>
-// Includes the descartes trajectory type we will be using
-#include <descartes_trajectory/axial_symmetric_pt.h>
-#include <descartes_trajectory/cart_trajectory_pt.h>
 // Includes the planner we will be using
 #include <descartes_planner/dense_planner.h>
-//Include Eigen geometry header for rotations
-#include </usr/include/eigen3/Eigen/Geometry>
 //Include visualization markers for RViz
-#include <visualization_msgs/Marker.h>
+//#include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+//Custom library for trajectory visualization in Rviz
+#include <descartes_tutorials/trajvis.h>
 
 typedef std::vector<descartes_core::TrajectoryPtPtr> TrajectoryVec;
 typedef TrajectoryVec::const_iterator TrajectoryIter;
 
-/**
- * Generates a toleranced cartesian point from a pose
- */
-descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(const Eigen::Affine3d& pose); //NOT WORKING
-
-//Works
-descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, 
-																double transY, 
-																double transZ, 
-																double rotX, 
-																double rotY, 
-																double rotZ);
-
-/**
- * Generates a cartesian point with free rotation about the Z axis of the EFF frame
- */
-descartes_core::TrajectoryPtPtr makeAxialSymmetricPoint(const Eigen::Affine3d& pose);
 
 /**
  * Translates a descartes trajectory to a ROS joint trajectory
@@ -50,18 +30,6 @@ toROSJointTrajectory(const TrajectoryVec& trajectory, const descartes_core::Robo
  * Sends a ROS trajectory to the robot controller
  */
 bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory);
-
-//Function for easily defining poses
-Eigen::Affine3d definePose(double transX, double transY, double transZ, double rotX, double rotY, double rotZ);
-  
-//Function for constructing quaternion starting from Euler rotations XYZ
-Eigen::Quaternion<double> eulerToQuat(double rotX, double rotY, double rotZ);
-  
-//Creates pose that can be added to the TrajectoryVec vector.
-descartes_core::TrajectoryPtPtr addPose(double transX, double transY, double transZ, double rotX, double rotY, double rotZ, bool symmetric);
-
-//Define function for easy marker creation
-visualization_msgs::Marker createMarker(double transX, double transY, double transZ, double rotX, double rotY, double rotZ);
 
 //Waits for a subscriber to subscribe to a publisher
 //Used to wait for RViz to subscribe to the Marker topic before publishing them
@@ -79,26 +47,29 @@ int main(int argc, char** argv)
   
   // 1. Define sequence of points
   TrajectoryVec points;
-  visualization_msgs::Marker marker;
   std::vector<visualization_msgs::Marker> markerVec;
+  trajvis::visualizedTrajectory trajectory;
 
   //Start the publisher for the Rviz Markers
   ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 1 );
   
   for (unsigned int i = 0; i < 10; ++i)
   {
-  	marker = createMarker(0.8, 0.3, 0.6 + i * 0.01, 0, M_PI / 2, 0);
-  	markerVec.push_back(marker);
-    points.push_back(addPose(0.8, 0.3, 0.6 + i * 0.01, 0, M_PI / 2, 0, true));
+    trajectory.addPoint(0.8, 0.3, 0.6 + i * 0.05, 0, M_PI / 2, 0, trajvis::AxialSymmetricPoint);
   }
   
   for (unsigned int i = 0; i < 10; ++i)
   {
-  	marker = createMarker(0.8, 0.3, 0.7, 0, (M_PI / 2) + i * 0.1, 0);
-  	markerVec.push_back(marker);
-    points.push_back(addPose(0.8, 0.3, 0.7, 0, (M_PI / 2) + i * 0.1, 0, true));
+    trajectory.addPoint(0.8, 0.3 + i * 0.05, 1.1, 0, M_PI / 2, 0, trajvis::AxialSymmetricPoint);
   }
   
+  for (unsigned int i = 0; i < 10; ++i)
+  {
+    trajectory.addPoint(0.8, 0.8, 1.1, 3 * (M_PI / 2), (M_PI / 2) - i * 0.2, 0, trajvis::AxialSymmetricPoint);
+  }
+  
+  markerVec = trajectory.getMarkers();
+  points = trajectory.getTrajectory();
   int size = markerVec.size();
   //Copy vector to array so we can publish it as a MarkerArray type.
   visualization_msgs::MarkerArray ma;
@@ -187,43 +158,6 @@ int main(int argc, char** argv)
   return 0;
 }
 
-descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(const Eigen::Affine3d& pose)
-{
-  using namespace descartes_core;
-  using namespace descartes_trajectory;
-	
-	Eigen::Vector3d vector;
-	vector = pose.translation();
-	
-	//Test using tolerances NOT WORKING CORRECTLY
-	descartes_trajectory::PositionTolerance p;
-	p = descartes_trajectory::PositionTolerance(vector(0), vector(0), vector(1), vector(1), vector(2), vector(2));
-	descartes_trajectory::OrientationTolerance o;
-	o = descartes_trajectory::OrientationTolerance(-M_PI, M_PI, 0, 0, 0, 0);
-	return TrajectoryPtPtr( new CartTrajectoryPt( TolerancedFrame(pose, p, o), 0.0, M_PI/12) );
-}
-
-descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, double transY, double transZ, double rotX, double rotY, 																	double rotZ)
-{
-	using namespace descartes_core;
-	using namespace descartes_trajectory;
-	Eigen::Affine3d pose = utils::toFrame(transX, transY, transZ, rotX, rotY, rotZ, utils::EulerConventions::XYZ);
-	
-	//Works
-	descartes_trajectory::PositionTolerance p;
-	p = ToleranceBase::zeroTolerance<PositionTolerance>(transX, transY, transZ);
-	descartes_trajectory::OrientationTolerance o;
-	o = ToleranceBase::createSymmetric<OrientationTolerance>(rotX, rotY, rotZ, 0, 0, 2*M_PI);
-	return TrajectoryPtPtr( new CartTrajectoryPt( TolerancedFrame(pose, p, o), 0.0, M_PI/12) );
-}
-
-descartes_core::TrajectoryPtPtr makeAxialSymmetricPoint(double x, double y, double z, double rx, double ry, double rz)
-{
-  using namespace descartes_core;
-  using namespace descartes_trajectory;
-  return TrajectoryPtPtr( new AxialSymmetricPt(x, y, z, rx, ry, rz, M_PI/12, AxialSymmetricPt::Z_AXIS) );
-}
-
 trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory,
                      const descartes_core::RobotModel& model,
@@ -290,92 +224,6 @@ bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory)
     ROS_WARN("Action server could not execute trajectory");
     return false;
   }
-}
-
-//Function for easily defining poses
-Eigen::Affine3d definePose(double transX, double transY, double transZ, double rotX, double rotY, double rotZ)
-{
-  Eigen::Matrix3d m;
-	m = Eigen::AngleAxisd(rotX, Eigen::Vector3d::UnitX())
-		* Eigen::AngleAxisd(rotY, Eigen::Vector3d::UnitY())
-		* Eigen::AngleAxisd(rotZ, Eigen::Vector3d::UnitZ());
-	
-	Eigen::Affine3d pose;
-	pose = Eigen::Translation3d(transX, transY, transZ);
-	pose.linear() = m;
-	
-	return pose;
-	
-}
-  
-//Function for constructing quaternion starting from Euler rotations XYZ
-Eigen::Quaternion<double> eulerToQuat(double rotX, double rotY, double rotZ)
-{
-  	Eigen::Matrix3d m;
-	m = Eigen::AngleAxisd(rotX, Eigen::Vector3d::UnitX())
-	  * Eigen::AngleAxisd(rotY, Eigen::Vector3d::UnitY())
-	  * Eigen::AngleAxisd(rotZ, Eigen::Vector3d::UnitZ());
-	
-	Eigen::AngleAxis<double> aa;
-	aa = Eigen::AngleAxisd(m);
-	
-	Eigen::Quaternion<double> quat;
-	quat = Eigen::Quaternion<double>(aa);
-	return quat;
-}
-  
-//Creates pose that can be added to the TrajectoryVec vector.
-descartes_core::TrajectoryPtPtr addPose(double transX, double transY, double transZ, double rotX, double rotY, double rotZ, bool symmetric)
-{
-	//Define the pose
-	Eigen::Affine3d pose;
-	
-	//Convert Affine3f to Affine3d
-	//Eigen::Affine3d pose_d = pose.cast<double>();
-	descartes_core::TrajectoryPtPtr pt;
-	if(symmetric){
-		//Convert to axialsymmetric point
-		pt = makeAxialSymmetricPoint(transX, transY, transZ, rotX, rotY, rotZ); 
-	} else {
-		pt = makeTolerancedCartesianPoint(transX, transY, transZ, rotX, rotY, rotZ);
-	}
-	return pt;
-}
-
-//Define function for easy marker creation
-visualization_msgs::Marker createMarker(double transX, double transY, double transZ, double rotX, double rotY, double rotZ)
-{
-	static int count;
-  visualization_msgs::Marker marker;
-	marker.header.frame_id = "base_link";
-	marker.header.stamp = ros::Time();
-	marker.ns = "my_namespace";
-	marker.id = count;
-	marker.type = visualization_msgs::Marker::ARROW;
-	marker.action = visualization_msgs::Marker::ADD;
-	marker.lifetime = ros::Duration(0);
-	
-	marker.pose.position.x = transX;
-	marker.pose.position.y = transY;
-	marker.pose.position.z = transZ;
-	
-	//To calculate the quaternion values we first define an AngleAxis object using Euler rotations, then convert it
-	Eigen::Quaternion<double> quat;
-	quat = eulerToQuat(rotX, rotY, rotZ);
-	
-	marker.pose.orientation.x = quat.x();
-	marker.pose.orientation.y = quat.y();
-	marker.pose.orientation.z = quat.z();
-	marker.pose.orientation.w = quat.w();
-	marker.scale.x = 0.1;
-	marker.scale.y = 0.01;
-	marker.scale.z = 0.01;
-	marker.color.a = 1.0;	//Alpha
-	marker.color.r = 1.0;
-	marker.color.g = 0.0;
-	marker.color.b = 0.0;
-	count++;
-	return marker;
 }
 
 //Waits for a subscriber to subscribe to a publisher

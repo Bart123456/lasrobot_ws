@@ -17,11 +17,12 @@ catkin_package()
 ###########
 
 include_directories(
-  ${catkin_INCLUDE_DIRS}
+	include
+	${catkin_INCLUDE_DIRS}
 )
 
  add_executable(${PROJECT_NAME}_tutorial1 src/tutorial1.cpp)
- add_executable(${PROJECT_NAME}_robot src/robot.cpp)
+ add_executable(${PROJECT_NAME}_robot src/robot.cpp src/trajvis.cpp)
 
  target_link_libraries(${PROJECT_NAME}_tutorial1
    ${catkin_LIBRARIES}
