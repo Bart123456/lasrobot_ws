@@ -5,8 +5,15 @@
 // Means by which we communicate with above action-server
 #include <actionlib/client/simple_action_client.h>
 
-// Includes the descartes robot model we will be using
+// Includes the descartes robot model we will be using; <moveit/planning_scene/planning_scene.h> already included
 #include <descartes_moveit/moveit_state_adapter.h>
+
+//Includes for collision objects
+#include <moveit/move_group_interface/move_group.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <geometric_shapes/shape_operations.h>
+
+
 // Includes the planner we will be using
 #include <descartes_planner/dense_planner.h>
 //Include visualization markers for RViz
@@ -52,9 +59,58 @@ int main(int argc, char** argv)
   //Used to store both cartesian waypoints and their visualization markers
   trajvis::visualizedTrajectory trajectory;
 
+  //Add collision object
+  moveit_msgs::CollisionObject co;
+
+  ROS_INFO("Loading mesh");
+  Eigen::Vector3d scale(1.0, 1.0, 1.0);
+  shapes::Mesh* m = shapes::createMeshFromResource("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", scale);
+  ROS_INFO("Mesh loaded");
+
+  shape_msgs::Mesh mesh;
+  shapes::ShapeMsg mesh_msg;
+  shapes::constructMsgFromShape(m, mesh_msg);
+  mesh = boost::get<shape_msgs::Mesh>(mesh_msg);
+
+  co.header.frame_id = "base_link";
+  co.id = "Table";
+  co.meshes.resize(1);
+  co.mesh_poses.resize(1);
+  co.meshes[0] = mesh;
+  co.mesh_poses[0].position.x = -0.4;
+  co.mesh_poses[0].position.y = 0.0;
+  co.mesh_poses[0].position.z = 0.6;
+  co.mesh_poses[0].orientation.w= 0.0;
+  co.mesh_poses[0].orientation.x= 0.0;
+  co.mesh_poses[0].orientation.y= 0.0;
+  co.mesh_poses[0].orientation.z= 0.0;
+
+  co.operation = co.ADD;
+  
+  //Define publisher
+  ros::Publisher planning_scene_diff_publisher;
+  planning_scene_diff_publisher = nh.advertise<moveit_msgs::PlanningScene>("planning_scene", 1);
+
+  moveit_msgs::PlanningScene planning_scene;
+  planning_scene.world.collision_objects.push_back(co);
+  planning_scene.is_diff = true;
+
+  //Wait for subscribers
+  ros::Rate loop_rate(10);
+  ROS_INFO("Waiting for planning_scene subscriber.");
+  if(waitForSubscribers(planning_scene_diff_publisher, ros::Duration(2.0)))
+  {
+	  planning_scene_diff_publisher.publish(planning_scene);
+	  ros::spinOnce();
+	  loop_rate.sleep();
+    ROS_INFO("Object added to the world.");
+  } else {
+    ROS_ERROR("No subscribers connected, collision object not added");
+  }
+
   //Start the publisher for the Rviz Markers
   ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 1 );
-  
+
   for (unsigned int i = 0; i < 10; ++i)
   {
     trajectory.addPoint(0.8, 0.3, 0.6 + i * 0.05, 0, M_PI / 2, 0, trajvis::AxialSymmetricPoint);
@@ -85,8 +141,8 @@ int main(int argc, char** argv)
   }
   
   //Wait for subscriber and publish the markerArray once the subscriber is found.
-  ros::Rate loop_rate(10);
-  ROS_INFO("Waiting for subscribers.");
+  
+  ROS_INFO("Waiting for marker subscribers.");
   if(waitForSubscribers(vis_pub, ros::Duration(2.0)))
   {
 	  ROS_INFO("Subscriber found, publishing markers.");
@@ -120,6 +176,9 @@ int main(int argc, char** argv)
     ROS_INFO("Could not initialize robot model");
     return -1;
   }
+
+  //Update the internal planning scene, so that the collision objects will be added
+  //model->updateInternals();
 
   // 3. Create a planner and initialize it with our robot model
   descartes_planner::DensePlanner planner;

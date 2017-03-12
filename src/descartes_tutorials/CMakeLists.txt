@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   descartes_planner
   trajectory_msgs
   visualization_msgs
+  moveit_ros_planning_interface
 )
 
 catkin_package()
