@@ -48,6 +48,8 @@ int main(int argc, char** argv)
   // 1. Define sequence of points
   TrajectoryVec points;
   std::vector<visualization_msgs::Marker> markerVec;
+
+  //Used to store both cartesian waypoints and their visualization markers
   trajvis::visualizedTrajectory trajectory;
 
   //Start the publisher for the Rviz Markers
@@ -68,10 +70,13 @@ int main(int argc, char** argv)
     trajectory.addPoint(0.8, 0.8, 1.1, 3 * (M_PI / 2), (M_PI / 2) - i * 0.2, 0, trajvis::AxialSymmetricPoint);
   }
   
+  //Get both the trajectory and the markers
   markerVec = trajectory.getMarkers();
   points = trajectory.getTrajectory();
-  int size = markerVec.size();
+
+  
   //Copy vector to array so we can publish it as a MarkerArray type.
+  int size = markerVec.size();
   visualization_msgs::MarkerArray ma;
   ma.markers.resize(size);
   for(int i = 0;i < size;i++)
@@ -84,10 +89,10 @@ int main(int argc, char** argv)
   ROS_INFO("Waiting for subscribers.");
   if(waitForSubscribers(vis_pub, ros::Duration(2.0)))
   {
-	ROS_INFO("Subscriber found, publishing markers.");
-	vis_pub.publish(ma);
-	ros::spinOnce();
-	loop_rate.sleep();
+	  ROS_INFO("Subscriber found, publishing markers.");
+	  vis_pub.publish(ma);
+	  ros::spinOnce();
+	  loop_rate.sleep();
   } else {
     ROS_ERROR("No subscribers connected, markers not published");
   }
