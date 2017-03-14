@@ -75,10 +75,10 @@ int main(int argc, char** argv)
   planning_scene.world.collision_objects.push_back(makeCollisionObject("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", tablescale, "Table", tablepose));
   
   //Welding workobject
-  Eigen::Vector3d objectscale(1.0,1.0,1.0);
+  Eigen::Vector3d objectscale(0.001,0.001,0.001);
   Eigen::Affine3d objectpose;
-  objectpose = descartes_core::utils::toFrame(0.6, 0.0, 0.1, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
-  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://descartes_tutorials/Scenarios/tube_on_plate.stl", objectscale, "tube_on_plate", objectpose));
+  objectpose = descartes_core::utils::toFrame(0.8, 0.3, 0.6, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, "tube_on_plate", objectpose));
   
   //Define publisher
   ros::Publisher planning_scene_diff_publisher;
