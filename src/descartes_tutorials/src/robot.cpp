@@ -42,6 +42,12 @@ bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory);
 //Used to wait for RViz to subscribe to the Marker topic before publishing them
 bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 
+//Creates a collision object from a mesh
+moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose);
+
+//Euler2QUAT
+Eigen::Quaternion<double> eulerToQuat(double rotX, double rotY, double rotZ);
+
 int main(int argc, char** argv)
 {
   // Initialize ROS
@@ -59,40 +65,25 @@ int main(int argc, char** argv)
   //Used to store both cartesian waypoints and their visualization markers
   trajvis::visualizedTrajectory trajectory;
 
-  //Add collision object
-  moveit_msgs::CollisionObject co;
+  //Create collision objects
+  moveit_msgs::PlanningScene planning_scene;
 
-  ROS_INFO("Loading mesh");
-  Eigen::Vector3d scale(1.0, 1.0, 1.0);
-  shapes::Mesh* m = shapes::createMeshFromResource("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", scale);
-  ROS_INFO("Mesh loaded");
-
-  shape_msgs::Mesh mesh;
-  shapes::ShapeMsg mesh_msg;
-  shapes::constructMsgFromShape(m, mesh_msg);
-  mesh = boost::get<shape_msgs::Mesh>(mesh_msg);
-
-  co.header.frame_id = "base_link";
-  co.id = "Table";
-  co.meshes.resize(1);
-  co.mesh_poses.resize(1);
-  co.meshes[0] = mesh;
-  co.mesh_poses[0].position.x = -0.4;
-  co.mesh_poses[0].position.y = 0.0;
-  co.mesh_poses[0].position.z = 0.6;
-  co.mesh_poses[0].orientation.w= 0.0;
-  co.mesh_poses[0].orientation.x= 0.0;
-  co.mesh_poses[0].orientation.y= 0.0;
-  co.mesh_poses[0].orientation.z= 0.0;
-
-  co.operation = co.ADD;
+  //Table
+  Eigen::Vector3d tablescale(1.0,1.0,1.0);
+  Eigen::Affine3d tablepose;
+  tablepose = descartes_core::utils::toFrame(-0.2, -0.6, 0.0, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", tablescale, "Table", tablepose));
+  
+  //Welding workobject
+  Eigen::Vector3d objectscale(1.0,1.0,1.0);
+  Eigen::Affine3d objectpose;
+  objectpose = descartes_core::utils::toFrame(0.6, 0.0, 0.1, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://descartes_tutorials/Scenarios/tube_on_plate.stl", objectscale, "tube_on_plate", objectpose));
   
   //Define publisher
   ros::Publisher planning_scene_diff_publisher;
   planning_scene_diff_publisher = nh.advertise<moveit_msgs::PlanningScene>("planning_scene", 1);
 
-  moveit_msgs::PlanningScene planning_scene;
-  planning_scene.world.collision_objects.push_back(co);
   planning_scene.is_diff = true;
 
   //Wait for subscribers
@@ -304,3 +295,56 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout)
     }
     return pub.getNumSubscribers() > 0;
 }
+
+moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose)
+{
+  moveit_msgs::CollisionObject co;
+
+  ROS_INFO("Loading mesh");
+  shapes::Mesh* m = shapes::createMeshFromResource(filepath, scale);
+  ROS_INFO("Mesh loaded");
+
+  shape_msgs::Mesh mesh;
+  shapes::ShapeMsg mesh_msg;
+  shapes::constructMsgFromShape(m, mesh_msg);
+  mesh = boost::get<shape_msgs::Mesh>(mesh_msg);
+
+  Eigen::Vector3d translations;
+  translations = pose.translation();
+  Eigen::Vector3d rotationsXYZ;
+  rotationsXYZ = pose.rotation().eulerAngles(0,1,2);
+  Eigen::Quaternion<double> quat;
+  quat = eulerToQuat(rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2]);
+
+  co.header.frame_id = "base_link";
+  co.id = ID;
+  co.meshes.resize(1);
+  co.mesh_poses.resize(1);
+  co.meshes[0] = mesh;
+  co.mesh_poses[0].position.x = translations[0];
+  co.mesh_poses[0].position.y = translations[1];
+  co.mesh_poses[0].position.z = translations[2];
+  co.mesh_poses[0].orientation.w= quat.w();
+  co.mesh_poses[0].orientation.x= quat.x();
+  co.mesh_poses[0].orientation.y= quat.y();
+  co.mesh_poses[0].orientation.z= quat.z();
+
+  co.operation = co.ADD;
+
+  return co;
+}
+
+Eigen::Quaternion<double> eulerToQuat(double rotX, double rotY, double rotZ)
+	{
+		Eigen::Matrix3d m;
+		m = Eigen::AngleAxisd(rotX, Eigen::Vector3d::UnitX())
+			* Eigen::AngleAxisd(rotY, Eigen::Vector3d::UnitY())
+			* Eigen::AngleAxisd(rotZ, Eigen::Vector3d::UnitZ());
+	
+		Eigen::AngleAxis<double> aa;
+		aa = Eigen::AngleAxisd(m);
+		
+		Eigen::Quaternion<double> quat;
+		quat = Eigen::Quaternion<double>(aa);
+		return quat;
+	}
