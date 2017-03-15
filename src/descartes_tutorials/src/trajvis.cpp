@@ -141,4 +141,32 @@ namespace trajvis{
 			markervec.push_back(createMarker(transX, transY, transZ, rotX, rotY, rotZ, descartes_trajectory::AxialSymmetricPt::Z_AXIS));
 		}
 	}
+
+	void visualizedTrajectory::addPoint(Eigen::Affine3d pose, ToleranceOption TO)
+	{
+		Eigen::Vector3d translations;
+		translations = pose.translation();
+		Eigen::Vector3d rotationsXYZ;
+		rotationsXYZ = pose.rotation().eulerAngles(0,1,2);
+		
+		if(TO == TolerancedCartesianPoint) {
+			trajvec.push_back(addPose(	translations[0], translations[1], translations[2], 
+										rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], false));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::X_AXIS));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::Y_AXIS));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::Z_AXIS));
+		} else if(TO == AxialSymmetricPoint) {
+			trajvec.push_back(addPose(	translations[0], translations[1], translations[2], 
+										rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], true));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::X_AXIS));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::Y_AXIS));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::Z_AXIS));
+		}
+	}
 }

@@ -37,6 +37,8 @@ namespace trajvis
 		
 		void addPoint(double transX, double transY, double transZ, double rotX, double rotY, double rotZ, ToleranceOption TO);
 		
+		void addPoint(Eigen::Affine3d pose, ToleranceOption TO);
+
 		private:
 		//Generates a toleranced cartesian point from a pose
 		descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, 

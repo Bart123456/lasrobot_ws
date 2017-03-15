@@ -22,6 +22,8 @@
 //Custom library for trajectory visualization in Rviz
 #include <descartes_tutorials/trajvis.h>
 
+#include <math.h>
+
 typedef std::vector<descartes_core::TrajectoryPtPtr> TrajectoryVec;
 typedef TrajectoryVec::const_iterator TrajectoryIter;
 
@@ -68,18 +70,39 @@ int main(int argc, char** argv)
   //Create collision objects
   moveit_msgs::PlanningScene planning_scene;
 
-  //Table
+  //Table (Tafel steekt 12mm boven oorsprong uit)
   Eigen::Vector3d tablescale(1.0,1.0,1.0);
   Eigen::Affine3d tablepose;
-  tablepose = descartes_core::utils::toFrame(-0.2, -0.6, 0.0, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  tablepose = descartes_core::utils::toFrame(0.3, -0.6, 0.1, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
   planning_scene.world.collision_objects.push_back(makeCollisionObject("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", tablescale, "Table", tablepose));
   
   //Welding workobject
   Eigen::Vector3d objectscale(0.001,0.001,0.001);
   Eigen::Affine3d objectpose;
-  objectpose = descartes_core::utils::toFrame(0.8, 0.3, 0.6, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
-  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, "tube_on_plate", objectpose));
   
+  double objectX, objectY, objectZ, objectrX, objectrY, objectrZ;
+  std::string objectID;
+  objectID = "tube_on_plate";
+  objectX = 0.8;
+  objectY = 0.0;
+  objectZ = 0.112;
+  objectrX = 0.0;
+  objectrY = 0.0;
+  objectrZ = 0.0;
+  
+
+  objectpose = descartes_core::utils::toFrame(objectX, objectY, objectZ, objectrX, objectrY, objectrZ, descartes_core::utils::EulerConventions::XYZ);
+  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, objectID, objectpose));
+  
+  //Planning scene colors
+  planning_scene.object_colors.resize(1);
+  planning_scene.object_colors[0].color.r = 0.5;
+  planning_scene.object_colors[0].color.g = 0.5;
+  planning_scene.object_colors[0].color.b = 0.5;
+  planning_scene.object_colors[0].color.a = 1.0;
+  planning_scene.object_colors[0].id = objectID;
+
+
   //Define publisher
   ros::Publisher planning_scene_diff_publisher;
   planning_scene_diff_publisher = nh.advertise<moveit_msgs::PlanningScene>("planning_scene", 1);
@@ -99,9 +122,48 @@ int main(int argc, char** argv)
     ROS_ERROR("No subscribers connected, collision object not added");
   }
 
-  //Start the publisher for the Rviz Markers
-  ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 1 );
+  //Define points on circle
+  double radius, height;
+  radius = 0.052;
+  height = objectY + 0.012;
+  int steps;
+  steps = 36;
 
+  double stepSize;
+  stepSize = (2*M_PI) / steps;
+
+  Eigen::Matrix3d rot;
+  Eigen::Vector3d trans_vec_1(objectX, objectY, objectZ + height);
+  Eigen::Translation<double,3> trans1(trans_vec_1);
+  Eigen::Vector3d trans_vec_2;
+  Eigen::Translation<double,3> trans2(trans_vec_2);
+
+  Eigen::Affine3d effectorPose;
+
+  for(int i = 0; i < steps; ++i)
+  {
+    
+		rot = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitX())
+			* Eigen::AngleAxisd(-(M_PI/2), Eigen::Vector3d::UnitY())
+			* Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitZ())
+      * Eigen::AngleAxisd(stepSize * i, Eigen::Vector3d::UnitX())
+      * Eigen::AngleAxisd(-(M_PI/4), Eigen::Vector3d::UnitY())
+      * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ());
+
+    trans_vec_2[0] = radius * cos(stepSize * i);
+    trans_vec_2[1] = radius * sin(stepSize * i);
+    trans_vec_2[2] = 0.0;
+
+    Eigen::Translation<double,3> trans2(trans_vec_2);
+
+    effectorPose = trans2 * trans1 * rot;
+
+    trajectory.addPoint(effectorPose, trajvis::AxialSymmetricPoint);
+    
+  }
+
+  
+  /*
   for (unsigned int i = 0; i < 10; ++i)
   {
     trajectory.addPoint(0.8, 0.3, 0.6 + i * 0.05, 0, M_PI / 2, 0, trajvis::AxialSymmetricPoint);
@@ -116,6 +178,7 @@ int main(int argc, char** argv)
   {
     trajectory.addPoint(0.8, 0.8, 1.1, 3 * (M_PI / 2), (M_PI / 2) - i * 0.2, 0, trajvis::AxialSymmetricPoint);
   }
+  */
   
   //Get both the trajectory and the markers
   markerVec = trajectory.getMarkers();
@@ -131,6 +194,8 @@ int main(int argc, char** argv)
     ma.markers[i] = markerVec[i];
   }
   
+  //Start the publisher for the Rviz Markers
+  ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 1 );
   //Wait for subscriber and publish the markerArray once the subscriber is found.
   
   ROS_INFO("Waiting for marker subscribers.");
@@ -211,7 +276,7 @@ int main(int argc, char** argv)
   
   ROS_INFO("Done!");
   return 0;
-}
+} //main
 
 trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory,
