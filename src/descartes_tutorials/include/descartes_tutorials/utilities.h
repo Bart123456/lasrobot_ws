@@ -7,7 +7,12 @@ namespace utilities {
 }
 
 namespace poseGeneration {
-	std::vector<Eigen::Affine3d> straightLine(	Eigen::Affine3d startPose
-												Eigen::Affine3d endPose
+	std::vector<Eigen::Affine3d> straightLine(	Eigen::Affine3d startPose,
+												Eigen::Affine3d endPose,
 												int steps);
+	std::vector<Eigen::Affine3d> circle(Eigen::Affine3d centerPose,
+										double radius,
+										int steps,
+										double angleY,
+										double arc);
 } //Namespace posegeneration

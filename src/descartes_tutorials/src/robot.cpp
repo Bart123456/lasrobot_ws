@@ -122,6 +122,38 @@ int main(int argc, char** argv)
     ROS_ERROR("No subscribers connected, collision object not added");
   }
 
+  std::vector<Eigen::Affine3d> poses;
+  Eigen::Affine3d centerPose;
+  centerPose = descartes_core::utils::toFrame(0.5, 0.1, 0.2, 1.0, 1.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  poses = poseGeneration::circle(centerPose, 0.1, 50, M_PI / 4, M_PI * 2);
+
+  int tempSize;
+  tempSize = poses.size();
+
+  for(int i = 0; i < tempSize; ++i)
+  {
+    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+  }
+
+  /*
+  //straightline test
+  std::vector<Eigen::Affine3d> poses;
+  Eigen::Affine3d startPose;
+  startPose = descartes_core::utils::toFrame(0.5, 0.1, 0.2, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  Eigen::Affine3d endPose;
+  endPose = descartes_core::utils::toFrame(0.5, 1.0, 1.0, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  poses = poseGeneration::straightLine(startPose, endPose, 100);
+
+  int tempSize;
+  tempSize = poses.size();
+
+  for(int i = 0; i < tempSize; ++i)
+  {
+    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+  }
+  */
+
+  /*
   //Define points on circle
   double radius, height;
   radius = 0.052;
@@ -161,6 +193,7 @@ int main(int argc, char** argv)
     trajectory.addPoint(effectorPose, trajvis::AxialSymmetricPoint);
     
   }
+  */
 
   
   /*
