@@ -8,6 +8,8 @@
 #include <descartes_trajectory/cart_trajectory_pt.h>
 //Include Eigen geometry header for rotations
 #include </usr/include/eigen3/Eigen/Geometry>
+//include utils library_path
+#include <descartes_tutorials/utilities.h>
 
 typedef std::vector<descartes_core::TrajectoryPtPtr> TrajectoryVec;
 
@@ -53,9 +55,6 @@ namespace trajvis
 		
 		//Function for easily defining poses
 		Eigen::Affine3d definePose(double transX, double transY, double transZ, double rotX, double rotY, double rotZ);
-		
-		//Function for constructing quaternion starting from Euler rotations XYZ
-		Eigen::Quaternion<double> eulerToQuat(double rotX, double rotY, double rotZ);
 		
 		//Creates pose that can be added to the TrajectoryVec vector.
 		descartes_core::TrajectoryPtPtr addPose(double transX, double transY, double transZ, double rotX, double rotY, double rotZ, 

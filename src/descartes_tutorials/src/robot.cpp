@@ -21,6 +21,8 @@
 #include <visualization_msgs/MarkerArray.h>
 //Custom library for trajectory visualization in Rviz
 #include <descartes_tutorials/trajvis.h>
+//Library for utilities
+#include <descartes_tutorials/utilities.h>
 
 #include <math.h>
 
@@ -47,8 +49,6 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 //Creates a collision object from a mesh
 moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose);
 
-//Euler2QUAT
-Eigen::Quaternion<double> eulerToQuat(double rotX, double rotY, double rotZ);
 
 int main(int argc, char** argv)
 {
@@ -379,7 +379,7 @@ moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Ve
   Eigen::Vector3d rotationsXYZ;
   rotationsXYZ = pose.rotation().eulerAngles(0,1,2);
   Eigen::Quaternion<double> quat;
-  quat = eulerToQuat(rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2]);
+  quat = utilities::eulerToQuat(rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2]);
 
   co.header.frame_id = "base_link";
   co.id = ID;
@@ -399,17 +399,4 @@ moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Ve
   return co;
 }
 
-Eigen::Quaternion<double> eulerToQuat(double rotX, double rotY, double rotZ)
-	{
-		Eigen::Matrix3d m;
-		m = Eigen::AngleAxisd(rotX, Eigen::Vector3d::UnitX())
-			* Eigen::AngleAxisd(rotY, Eigen::Vector3d::UnitY())
-			* Eigen::AngleAxisd(rotZ, Eigen::Vector3d::UnitZ());
-	
-		Eigen::AngleAxis<double> aa;
-		aa = Eigen::AngleAxisd(m);
-		
-		Eigen::Quaternion<double> quat;
-		quat = Eigen::Quaternion<double>(aa);
-		return quat;
-	}
+
