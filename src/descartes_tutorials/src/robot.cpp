@@ -54,8 +54,8 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 //Creates a collision object from a mesh
 moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose);
 
-bool readTrajectoryFile = true;
-bool writeTrajectoryFile = false;
+bool readTrajectoryFile = false;
+bool writeTrajectoryFile = true;
 std::string bagFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
 
 int main(int argc, char** argv)
@@ -138,7 +138,7 @@ int main(int argc, char** argv)
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.054, 8, -(M_PI / 4), 2 * M_PI);
+  poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
 
   int tempSize;
   tempSize = poses.size();
@@ -338,8 +338,6 @@ bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory)
   goal.goal_time_tolerance = ros::Duration(1.0);
 
   ac.sendGoal(goal);
-  ROS_INFO("After ac.sendgoal()");
-
   
   if (ac.waitForResult(goal.trajectory.points[goal.trajectory.points.size()-1].time_from_start + ros::Duration(5)))
   {
