@@ -125,7 +125,7 @@ int main(int argc, char** argv)
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(0.5, 0.1, 0.2, 1.0, 1.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.1, 50, M_PI / 4, M_PI * 2);
+  poses = poseGeneration::circle(centerPose, 0.1, 20, M_PI / 4, 2 * (M_PI / 3));
 
   int tempSize;
   tempSize = poses.size();
