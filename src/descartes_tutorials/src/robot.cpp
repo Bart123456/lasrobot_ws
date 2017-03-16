@@ -26,6 +26,11 @@
 
 #include <math.h>
 
+//For saving msgs to file.
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
+#include <boost/foreach.hpp>
+
 typedef std::vector<descartes_core::TrajectoryPtPtr> TrajectoryVec;
 typedef TrajectoryVec::const_iterator TrajectoryIter;
 
@@ -49,6 +54,9 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 //Creates a collision object from a mesh
 moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose);
 
+bool readTrajectoryFile = true;
+bool writeTrajectoryFile = false;
+std::string bagFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
 
 int main(int argc, char** argv)
 {
@@ -59,6 +67,10 @@ int main(int argc, char** argv)
   // Required for communication with moveit components
   ros::AsyncSpinner spinner (1);
   spinner.start();
+
+  trajectory_msgs::JointTrajectory readTrajectory;
+  trajectory_msgs::JointTrajectory joint_solution;
+  
   
   // 1. Define sequence of points
   TrajectoryVec points;
@@ -122,10 +134,11 @@ int main(int argc, char** argv)
     ROS_ERROR("No subscribers connected, collision object not added");
   }
 
+
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
-  centerPose = descartes_core::utils::toFrame(0.5, 0.1, 0.2, 1.0, 1.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.1, 20, M_PI / 4, 2 * (M_PI / 3));
+  centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
+  poses = poseGeneration::circle(centerPose, 0.054, 8, -(M_PI / 4), 2 * M_PI);
 
   int tempSize;
   tempSize = poses.size();
@@ -134,84 +147,6 @@ int main(int argc, char** argv)
   {
     trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
   }
-
-  /*
-  //straightline test
-  std::vector<Eigen::Affine3d> poses;
-  Eigen::Affine3d startPose;
-  startPose = descartes_core::utils::toFrame(0.5, 0.1, 0.2, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
-  Eigen::Affine3d endPose;
-  endPose = descartes_core::utils::toFrame(0.5, 1.0, 1.0, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::straightLine(startPose, endPose, 100);
-
-  int tempSize;
-  tempSize = poses.size();
-
-  for(int i = 0; i < tempSize; ++i)
-  {
-    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
-  }
-  */
-
-  /*
-  //Define points on circle
-  double radius, height;
-  radius = 0.052;
-  height = objectY + 0.012;
-  int steps;
-  steps = 100;
-
-  double stepSize;
-  stepSize = (2*M_PI) / steps;
-
-  Eigen::Matrix3d rot;
-  Eigen::Vector3d trans_vec_1(objectX, objectY, objectZ + height);
-  Eigen::Translation<double,3> trans1(trans_vec_1);
-  Eigen::Vector3d trans_vec_2;
-  Eigen::Translation<double,3> trans2(trans_vec_2);
-
-  Eigen::Affine3d effectorPose;
-
-  for(int i = 0; i < steps; ++i)
-  {
-    
-		rot = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitX())
-			* Eigen::AngleAxisd(-(M_PI/2), Eigen::Vector3d::UnitY())
-			* Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitZ())
-      * Eigen::AngleAxisd(stepSize * i, Eigen::Vector3d::UnitX())
-      * Eigen::AngleAxisd(-(M_PI/4), Eigen::Vector3d::UnitY())
-      * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ());
-
-    trans_vec_2[0] = radius * cos(stepSize * i);
-    trans_vec_2[1] = radius * sin(stepSize * i);
-    trans_vec_2[2] = 0.0;
-
-    Eigen::Translation<double,3> trans2(trans_vec_2);
-
-    effectorPose = trans2 * trans1 * rot;
-
-    trajectory.addPoint(effectorPose, trajvis::AxialSymmetricPoint);
-    
-  }
-  */
-
-  
-  /*
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    trajectory.addPoint(0.8, 0.3, 0.6 + i * 0.05, 0, M_PI / 2, 0, trajvis::AxialSymmetricPoint);
-  }
-  
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    trajectory.addPoint(0.8, 0.3 + i * 0.05, 1.1, 0, M_PI / 2, 0, trajvis::AxialSymmetricPoint);
-  }
-  
-  for (unsigned int i = 0; i < 10; ++i)
-  {
-    trajectory.addPoint(0.8, 0.8, 1.1, 3 * (M_PI / 2), (M_PI / 2) - i * 0.2, 0, trajvis::AxialSymmetricPoint);
-  }
-  */
   
   //Get both the trajectory and the markers
   markerVec = trajectory.getMarkers();
@@ -234,10 +169,10 @@ int main(int argc, char** argv)
   ROS_INFO("Waiting for marker subscribers.");
   if(waitForSubscribers(vis_pub, ros::Duration(2.0)))
   {
-	  ROS_INFO("Subscriber found, publishing markers.");
-	  vis_pub.publish(ma);
-	  ros::spinOnce();
-	  loop_rate.sleep();
+    ROS_INFO("Subscriber found, publishing markers.");
+    vis_pub.publish(ma);
+    ros::spinOnce();
+    loop_rate.sleep();
   } else {
     ROS_ERROR("No subscribers connected, markers not published");
   }
@@ -274,28 +209,62 @@ int main(int argc, char** argv)
   planner.initialize(model);
   //planner.initialize(model, cost_function_callback) for a custom costfunction
 
-  // 4. Feed the trajectory to the planner
-  if (!planner.planPath(points))
+  //Don't plan path if it is read from file.
+  if(!readTrajectoryFile)
   {
-    ROS_ERROR("Could not solve for a valid path");
-    return -2;
+    // 4. Feed the trajectory to the planner
+    if (!planner.planPath(points))
+    {
+      ROS_ERROR("Could not solve for a valid path");
+      return -2;
+    }
+
+    TrajectoryVec result;
+    if (!planner.getPath(result))
+    {
+      ROS_ERROR("Could not retrieve path");
+      return -3;
+    }
+
+    // 5. Translate the result into a type that ROS understands
+    // Get Joint Names
+    std::vector<std::string> names;
+    
+    nh.getParam("controller_joint_names", names);
+    // Generate a ROS joint trajectory with the result path, robot model, given joint names,
+    // a certain time delta between each trajectory point
+    trajectory_msgs::JointTrajectory joint_solution = toROSJointTrajectory(result, *model, names, 1.0);
+  } //END OF IF
+
+  if(readTrajectoryFile)
+  {
+    rosbag::Bag bag(bagFilePath, rosbag::bagmode::Read);
+    rosbag::View view(bag, rosbag::TopicQuery("trajectory"));
+
+    BOOST_FOREACH(rosbag::MessageInstance const m, view)
+    {
+        trajectory_msgs::JointTrajectory::ConstPtr i = m.instantiate<trajectory_msgs::JointTrajectory>();
+        if (m.getTopic() == "trajectory")
+        {
+          readTrajectory = *i;
+          ROS_INFO("Trajectory .bag file read.");
+        }
+    }
+    bag.close();
+    joint_solution = readTrajectory;
+    joint_solution.header.stamp = ros::Time::now();
+    ROS_INFO("joint_solution overwritten");
   }
 
-  TrajectoryVec result;
-  if (!planner.getPath(result))
+  if(writeTrajectoryFile && !readTrajectoryFile)
   {
-    ROS_ERROR("Could not retrieve path");
-    return -3;
+    rosbag::Bag bag1;
+    bag1.open(bagFilePath, rosbag::bagmode::Write);
+    bag1.write("trajectory", ros::Time::now(), joint_solution);
+    bag1.close();
+    ROS_INFO("Trajectory written to .bag file.");
   }
-
-  // 5. Translate the result into a type that ROS understands
-  // Get Joint Names
-  std::vector<std::string> names;
   
-  nh.getParam("controller_joint_names", names);
-  // Generate a ROS joint trajectory with the result path, robot model, given joint names,
-  // a certain time delta between each trajectory point
-  trajectory_msgs::JointTrajectory joint_solution = toROSJointTrajectory(result, *model, names, 1.0);
 
   // 6. Send the ROS trajectory to the robot for execution
 	while(ros::ok()) {
@@ -367,9 +336,11 @@ bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory)
   control_msgs::FollowJointTrajectoryGoal goal;
   goal.trajectory = trajectory;
   goal.goal_time_tolerance = ros::Duration(1.0);
-  
-  ac.sendGoal(goal);
 
+  ac.sendGoal(goal);
+  ROS_INFO("After ac.sendgoal()");
+
+  
   if (ac.waitForResult(goal.trajectory.points[goal.trajectory.points.size()-1].time_from_start + ros::Duration(5)))
   {
     ROS_INFO("Action server reported successful execution");
@@ -378,6 +349,7 @@ bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory)
     ROS_WARN("Action server could not execute trajectory");
     return false;
   }
+  
 }
 
 //Waits for a subscriber to subscribe to a publisher

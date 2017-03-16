@@ -41,7 +41,7 @@ namespace poseGeneration {
 										double radius,
 										int steps,
 										double angleY,
-										double arc = M_PI * 2)
+										double arc)
 	{
 		Eigen::Vector3d unitZ(0.0,0.0,1.0);
 		unitZ = centerPose.rotation() * unitZ;
