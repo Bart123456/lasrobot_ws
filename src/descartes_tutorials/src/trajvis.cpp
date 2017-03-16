@@ -43,21 +43,6 @@ namespace trajvis{
 		return pose;
 	}
 	
-	Eigen::Quaternion<double> visualizedTrajectory::eulerToQuat(double rotX, double rotY, double rotZ)
-	{
-		Eigen::Matrix3d m;
-		m = Eigen::AngleAxisd(rotX, Eigen::Vector3d::UnitX())
-			* Eigen::AngleAxisd(rotY, Eigen::Vector3d::UnitY())
-			* Eigen::AngleAxisd(rotZ, Eigen::Vector3d::UnitZ());
-	
-		Eigen::AngleAxis<double> aa;
-		aa = Eigen::AngleAxisd(m);
-		
-		Eigen::Quaternion<double> quat;
-		quat = Eigen::Quaternion<double>(aa);
-		return quat;
-	}
-	
 	descartes_core::TrajectoryPtPtr visualizedTrajectory::addPose(	double transX, double transY, double transZ, double rotX, double rotY,
 																	double rotZ, bool symmetric = true)
 	{
@@ -95,19 +80,19 @@ namespace trajvis{
 		Eigen::Quaternion<double> quat;
 		if(axis == descartes_trajectory::AxialSymmetricPt::X_AXIS)
 		{
-			quat = eulerToQuat(rotX, rotY, rotZ);
+			quat = utilities::eulerToQuat(rotX, rotY, rotZ);
 			marker.color.r = 1.0;
 			marker.color.g = 0.0;
 			marker.color.b = 0.0;
 		} else if(axis == descartes_trajectory::AxialSymmetricPt::Y_AXIS)
 		{
-			quat = eulerToQuat(rotX, rotY, rotZ) * eulerToQuat(0, 0, M_PI / 2);
+			quat = utilities::eulerToQuat(rotX, rotY, rotZ) * utilities::eulerToQuat(0, 0, M_PI / 2);
 			marker.color.r = 0.0;
 			marker.color.g = 1.0;
 			marker.color.b = 0.0;
 		} else if(axis == descartes_trajectory::AxialSymmetricPt::Z_AXIS)
 		{
-			quat = eulerToQuat(rotX, rotY, rotZ) * eulerToQuat(0, 3 * (M_PI / 2), 0);
+			quat = utilities::eulerToQuat(rotX, rotY, rotZ) * utilities::eulerToQuat(0, 3 * (M_PI / 2), 0);
 			marker.color.r = 0.0;
 			marker.color.g = 0.0;
 			marker.color.b = 1.0;
@@ -139,6 +124,34 @@ namespace trajvis{
 			markervec.push_back(createMarker(transX, transY, transZ, rotX, rotY, rotZ, descartes_trajectory::AxialSymmetricPt::X_AXIS));
 			markervec.push_back(createMarker(transX, transY, transZ, rotX, rotY, rotZ, descartes_trajectory::AxialSymmetricPt::Y_AXIS));
 			markervec.push_back(createMarker(transX, transY, transZ, rotX, rotY, rotZ, descartes_trajectory::AxialSymmetricPt::Z_AXIS));
+		}
+	}
+
+	void visualizedTrajectory::addPoint(Eigen::Affine3d pose, ToleranceOption TO)
+	{
+		Eigen::Vector3d translations;
+		translations = pose.translation();
+		Eigen::Vector3d rotationsXYZ;
+		rotationsXYZ = pose.rotation().eulerAngles(0,1,2);
+		
+		if(TO == TolerancedCartesianPoint) {
+			trajvec.push_back(addPose(	translations[0], translations[1], translations[2], 
+										rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], false));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::X_AXIS));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::Y_AXIS));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::Z_AXIS));
+		} else if(TO == AxialSymmetricPoint) {
+			trajvec.push_back(addPose(	translations[0], translations[1], translations[2], 
+										rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], true));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::X_AXIS));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::Y_AXIS));
+			markervec.push_back(createMarker(	translations[0], translations[1], translations[2], 
+												rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2], descartes_trajectory::AxialSymmetricPt::Z_AXIS));
 		}
 	}
 }

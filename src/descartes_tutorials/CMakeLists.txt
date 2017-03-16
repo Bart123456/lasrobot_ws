@@ -2,12 +2,14 @@ cmake_minimum_required(VERSION 2.8.3)
 project(descartes_tutorials)
 
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   descartes_core
   descartes_moveit
   descartes_trajectory
   descartes_planner
   trajectory_msgs
   visualization_msgs
+  moveit_ros_planning_interface
 )
 
 catkin_package()
@@ -30,6 +32,7 @@ include_directories(
  
  target_link_libraries(${PROJECT_NAME}_robot
    ${catkin_LIBRARIES}
+   utilities
  )
 
 set_target_properties(${PROJECT_NAME}_tutorial1
@@ -59,4 +62,13 @@ install(TARGETS ${PROJECT_NAME}_robot
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.h"
+)
+
+add_library(utilities
+  include/descartes_tutorials/utilities.h
+  src/utilities.cpp
+)
+add_dependencies(utilities ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(utilities
+  ${catkin_LIBRARIES}
 )

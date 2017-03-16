@@ -5,8 +5,15 @@
 // Means by which we communicate with above action-server
 #include <actionlib/client/simple_action_client.h>
 
-// Includes the descartes robot model we will be using
+// Includes the descartes robot model we will be using; <moveit/planning_scene/planning_scene.h> already included
 #include <descartes_moveit/moveit_state_adapter.h>
+
+//Includes for collision objects
+#include <moveit/move_group_interface/move_group.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <geometric_shapes/shape_operations.h>
+
+
 // Includes the planner we will be using
 #include <descartes_planner/dense_planner.h>
 //Include visualization markers for RViz
@@ -14,6 +21,10 @@
 #include <visualization_msgs/MarkerArray.h>
 //Custom library for trajectory visualization in Rviz
 #include <descartes_tutorials/trajvis.h>
+//Library for utilities
+#include <descartes_tutorials/utilities.h>
+
+#include <math.h>
 
 typedef std::vector<descartes_core::TrajectoryPtPtr> TrajectoryVec;
 typedef TrajectoryVec::const_iterator TrajectoryIter;
@@ -35,6 +46,10 @@ bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory);
 //Used to wait for RViz to subscribe to the Marker topic before publishing them
 bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 
+//Creates a collision object from a mesh
+moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose);
+
+
 int main(int argc, char** argv)
 {
   // Initialize ROS
@@ -52,9 +67,136 @@ int main(int argc, char** argv)
   //Used to store both cartesian waypoints and their visualization markers
   trajvis::visualizedTrajectory trajectory;
 
-  //Start the publisher for the Rviz Markers
-  ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 1 );
+  //Create collision objects
+  moveit_msgs::PlanningScene planning_scene;
+
+  //Table (Tafel steekt 12mm boven oorsprong uit)
+  Eigen::Vector3d tablescale(1.0,1.0,1.0);
+  Eigen::Affine3d tablepose;
+  tablepose = descartes_core::utils::toFrame(0.3, -0.6, 0.1, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", tablescale, "Table", tablepose));
   
+  //Welding workobject
+  Eigen::Vector3d objectscale(0.001,0.001,0.001);
+  Eigen::Affine3d objectpose;
+  
+  double objectX, objectY, objectZ, objectrX, objectrY, objectrZ;
+  std::string objectID;
+  objectID = "tube_on_plate";
+  objectX = 0.8;
+  objectY = 0.0;
+  objectZ = 0.112;
+  objectrX = 0.0;
+  objectrY = 0.0;
+  objectrZ = 0.0;
+  
+
+  objectpose = descartes_core::utils::toFrame(objectX, objectY, objectZ, objectrX, objectrY, objectrZ, descartes_core::utils::EulerConventions::XYZ);
+  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, objectID, objectpose));
+  
+  //Planning scene colors
+  planning_scene.object_colors.resize(1);
+  planning_scene.object_colors[0].color.r = 0.5;
+  planning_scene.object_colors[0].color.g = 0.5;
+  planning_scene.object_colors[0].color.b = 0.5;
+  planning_scene.object_colors[0].color.a = 1.0;
+  planning_scene.object_colors[0].id = objectID;
+
+
+  //Define publisher
+  ros::Publisher planning_scene_diff_publisher;
+  planning_scene_diff_publisher = nh.advertise<moveit_msgs::PlanningScene>("planning_scene", 1);
+
+  planning_scene.is_diff = true;
+
+  //Wait for subscribers
+  ros::Rate loop_rate(10);
+  ROS_INFO("Waiting for planning_scene subscriber.");
+  if(waitForSubscribers(planning_scene_diff_publisher, ros::Duration(2.0)))
+  {
+	  planning_scene_diff_publisher.publish(planning_scene);
+	  ros::spinOnce();
+	  loop_rate.sleep();
+    ROS_INFO("Object added to the world.");
+  } else {
+    ROS_ERROR("No subscribers connected, collision object not added");
+  }
+
+  std::vector<Eigen::Affine3d> poses;
+  Eigen::Affine3d centerPose;
+  centerPose = descartes_core::utils::toFrame(0.5, 0.1, 0.2, 1.0, 1.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  poses = poseGeneration::circle(centerPose, 0.1, 20, M_PI / 4, 2 * (M_PI / 3));
+
+  int tempSize;
+  tempSize = poses.size();
+
+  for(int i = 0; i < tempSize; ++i)
+  {
+    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+  }
+
+  /*
+  //straightline test
+  std::vector<Eigen::Affine3d> poses;
+  Eigen::Affine3d startPose;
+  startPose = descartes_core::utils::toFrame(0.5, 0.1, 0.2, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  Eigen::Affine3d endPose;
+  endPose = descartes_core::utils::toFrame(0.5, 1.0, 1.0, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  poses = poseGeneration::straightLine(startPose, endPose, 100);
+
+  int tempSize;
+  tempSize = poses.size();
+
+  for(int i = 0; i < tempSize; ++i)
+  {
+    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+  }
+  */
+
+  /*
+  //Define points on circle
+  double radius, height;
+  radius = 0.052;
+  height = objectY + 0.012;
+  int steps;
+  steps = 100;
+
+  double stepSize;
+  stepSize = (2*M_PI) / steps;
+
+  Eigen::Matrix3d rot;
+  Eigen::Vector3d trans_vec_1(objectX, objectY, objectZ + height);
+  Eigen::Translation<double,3> trans1(trans_vec_1);
+  Eigen::Vector3d trans_vec_2;
+  Eigen::Translation<double,3> trans2(trans_vec_2);
+
+  Eigen::Affine3d effectorPose;
+
+  for(int i = 0; i < steps; ++i)
+  {
+    
+		rot = Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitX())
+			* Eigen::AngleAxisd(-(M_PI/2), Eigen::Vector3d::UnitY())
+			* Eigen::AngleAxisd(M_PI/2, Eigen::Vector3d::UnitZ())
+      * Eigen::AngleAxisd(stepSize * i, Eigen::Vector3d::UnitX())
+      * Eigen::AngleAxisd(-(M_PI/4), Eigen::Vector3d::UnitY())
+      * Eigen::AngleAxisd(0.0, Eigen::Vector3d::UnitZ());
+
+    trans_vec_2[0] = radius * cos(stepSize * i);
+    trans_vec_2[1] = radius * sin(stepSize * i);
+    trans_vec_2[2] = 0.0;
+
+    Eigen::Translation<double,3> trans2(trans_vec_2);
+
+    effectorPose = trans2 * trans1 * rot;
+
+    trajectory.addPoint(effectorPose, trajvis::AxialSymmetricPoint);
+    
+  }
+  */
+
+  
+  /*
   for (unsigned int i = 0; i < 10; ++i)
   {
     trajectory.addPoint(0.8, 0.3, 0.6 + i * 0.05, 0, M_PI / 2, 0, trajvis::AxialSymmetricPoint);
@@ -69,6 +211,7 @@ int main(int argc, char** argv)
   {
     trajectory.addPoint(0.8, 0.8, 1.1, 3 * (M_PI / 2), (M_PI / 2) - i * 0.2, 0, trajvis::AxialSymmetricPoint);
   }
+  */
   
   //Get both the trajectory and the markers
   markerVec = trajectory.getMarkers();
@@ -84,9 +227,11 @@ int main(int argc, char** argv)
     ma.markers[i] = markerVec[i];
   }
   
+  //Start the publisher for the Rviz Markers
+  ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 1 );
   //Wait for subscriber and publish the markerArray once the subscriber is found.
-  ros::Rate loop_rate(10);
-  ROS_INFO("Waiting for subscribers.");
+  
+  ROS_INFO("Waiting for marker subscribers.");
   if(waitForSubscribers(vis_pub, ros::Duration(2.0)))
   {
 	  ROS_INFO("Subscriber found, publishing markers.");
@@ -121,9 +266,13 @@ int main(int argc, char** argv)
     return -1;
   }
 
+  //Update the internal planning scene, so that the collision objects will be added
+  //model->updateInternals();
+
   // 3. Create a planner and initialize it with our robot model
   descartes_planner::DensePlanner planner;
   planner.initialize(model);
+  //planner.initialize(model, cost_function_callback) for a custom costfunction
 
   // 4. Feed the trajectory to the planner
   if (!planner.planPath(points))
@@ -161,7 +310,7 @@ int main(int argc, char** argv)
   
   ROS_INFO("Done!");
   return 0;
-}
+} //main
 
 trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory,
@@ -245,3 +394,43 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout)
     }
     return pub.getNumSubscribers() > 0;
 }
+
+moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose)
+{
+  moveit_msgs::CollisionObject co;
+
+  ROS_INFO("Loading mesh");
+  shapes::Mesh* m = shapes::createMeshFromResource(filepath, scale);
+  ROS_INFO("Mesh loaded");
+
+  shape_msgs::Mesh mesh;
+  shapes::ShapeMsg mesh_msg;
+  shapes::constructMsgFromShape(m, mesh_msg);
+  mesh = boost::get<shape_msgs::Mesh>(mesh_msg);
+
+  Eigen::Vector3d translations;
+  translations = pose.translation();
+  Eigen::Vector3d rotationsXYZ;
+  rotationsXYZ = pose.rotation().eulerAngles(0,1,2);
+  Eigen::Quaternion<double> quat;
+  quat = utilities::eulerToQuat(rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2]);
+
+  co.header.frame_id = "base_link";
+  co.id = ID;
+  co.meshes.resize(1);
+  co.mesh_poses.resize(1);
+  co.meshes[0] = mesh;
+  co.mesh_poses[0].position.x = translations[0];
+  co.mesh_poses[0].position.y = translations[1];
+  co.mesh_poses[0].position.z = translations[2];
+  co.mesh_poses[0].orientation.w= quat.w();
+  co.mesh_poses[0].orientation.x= quat.x();
+  co.mesh_poses[0].orientation.y= quat.y();
+  co.mesh_poses[0].orientation.z= quat.z();
+
+  co.operation = co.ADD;
+
+  return co;
+}
+
+
