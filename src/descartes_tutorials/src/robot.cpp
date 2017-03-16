@@ -159,7 +159,7 @@ int main(int argc, char** argv)
   radius = 0.052;
   height = objectY + 0.012;
   int steps;
-  steps = 36;
+  steps = 100;
 
   double stepSize;
   stepSize = (2*M_PI) / steps;
@@ -272,6 +272,7 @@ int main(int argc, char** argv)
   // 3. Create a planner and initialize it with our robot model
   descartes_planner::DensePlanner planner;
   planner.initialize(model);
+  //planner.initialize(model, cost_function_callback) for a custom costfunction
 
   // 4. Feed the trajectory to the planner
   if (!planner.planPath(points))
