@@ -98,13 +98,7 @@ int main(int argc, char** argv)
   planning_scene.world.collision_objects.push_back(utilities::makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, objectID, objectpose));
   
   //Planning scene colors
-  planning_scene.object_colors.resize(1);
-  planning_scene.object_colors[0].color.r = 0.5;
-  planning_scene.object_colors[0].color.g = 0.5;
-  planning_scene.object_colors[0].color.b = 0.5;
-  planning_scene.object_colors[0].color.a = 1.0;
-  planning_scene.object_colors[0].id = objectID;
-
+  planning_scene.object_colors.push_back(utilities::makeObjectColor(objectID, 0.5, 0.5, 0.5, 0.8));
 
   //Define publisher
   ros::Publisher planning_scene_diff_publisher;
