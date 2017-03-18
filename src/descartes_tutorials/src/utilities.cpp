@@ -26,6 +26,7 @@ namespace utilities {
 		Eigen::Affine3d tablepose;
 		tablepose = descartes_core::utils::toFrame(0.3, -0.6, 0.1, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
 		planningScene.world.collision_objects.push_back(makeCollisionObject("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", tablescale, "Table", tablepose));
+		planningScene.object_colors.push_back(utilities::makeObjectColor("Table", 0.2, 0.2, 0.2, 1.0));
 	}
 
 	moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose)
@@ -64,6 +65,32 @@ namespace utilities {
 		co.operation = co.ADD;
 
 		return co;
+	}
+
+	std_msgs::ColorRGBA makeColor(double r, double g, double b, double a)
+	{
+		std_msgs::ColorRGBA color;
+		color.r = r;
+		color.g = g;
+		color.b = b;
+		color.a = a;
+		return color;
+	}
+
+	moveit_msgs::ObjectColor makeObjectColor(std::string id, std_msgs::ColorRGBA color)
+	{
+		moveit_msgs::ObjectColor oc;
+		oc.id = id;
+		oc.color = color;
+		return oc;
+	}
+
+	moveit_msgs::ObjectColor makeObjectColor(std::string id, double r, double g, double b, double a)
+	{
+		moveit_msgs::ObjectColor oc;
+		oc.color = makeColor(r, g, b, a);
+		oc.id = id;
+		return oc;
 	}
 
 } //Namespace utilities
