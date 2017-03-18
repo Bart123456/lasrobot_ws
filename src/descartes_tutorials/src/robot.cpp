@@ -224,7 +224,7 @@ int main(int argc, char** argv)
     nh.getParam("controller_joint_names", names);
     // Generate a ROS joint trajectory with the result path, robot model, given joint names,
     // a certain time delta between each trajectory point
-    trajectory_msgs::JointTrajectory joint_solution = toROSJointTrajectory(result, *model, names, 1.0);
+    joint_solution = toROSJointTrajectory(result, *model, names, 1.0);
   } //END OF IF
 
   if(readTrajectoryFile)
