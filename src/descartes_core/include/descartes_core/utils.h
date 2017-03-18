@@ -21,6 +21,8 @@
 
 #include <boost/shared_ptr.hpp>
 #include <Eigen/Core>
+//For logError() function
+#include <console_bridge/console.h>
 
 /** \def DESCARTES_CLASS_FORWARD
     Macro that forward declares a class XXX, and also defines two shared ptrs with named XXXPtr and XXXConstPtr  */

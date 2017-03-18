@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   trajectory_msgs
   visualization_msgs
   moveit_ros_planning_interface
+  rosbag
 )
 
 catkin_package()
