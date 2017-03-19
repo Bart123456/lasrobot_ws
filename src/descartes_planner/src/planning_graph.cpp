@@ -817,7 +817,8 @@ bool PlanningGraph::calculateJointSolutions(const std::vector<TrajectoryPtPtr>& 
   for (std::size_t i = 0; i < points.size(); ++i)
   {
     std::vector<std::vector<double>> joint_poses;
-    points[i]->getJointPoses(*robot_model_, joint_poses);
+    std::vector<double> weldingCosts;
+    points[i]->getJointPoses(*robot_model_, joint_poses, weldingCosts);
 
     if (joint_poses.empty())
     {
@@ -826,9 +827,12 @@ bool PlanningGraph::calculateJointSolutions(const std::vector<TrajectoryPtPtr>& 
     }
 
     poses[i].reserve(joint_poses.size());
+    int counter = 0;
     for (auto& sol : joint_poses)
     {
       poses[i].emplace_back(std::move(sol), points[i]->getTiming());
+      poses[i].back().setWeldingCost(weldingCosts[counter]);
+      ++counter;
     }
   }
 
@@ -935,6 +939,11 @@ bool PlanningGraph::calculateEdgeWeights(const std::vector<JointTrajectoryPt>& s
       edge.joint_end = end_joint.getID();
       edge.transition_cost = edge_result.second;
       edge_results.push_back(edge);
+      if(edge_result.second < 0)
+      {
+        ROS_INFO_STREAM("Calculated negative edge weight: " << edge_result.second);
+      }
+      
     }
   }
 
@@ -1043,7 +1052,8 @@ PlanningGraph::EdgeWeightResult PlanningGraph::edgeWeight(const JointTrajectoryP
         double joint_diff = std::abs(end_vector[i] - start_vector[i]);
         vector_diff += joint_diff;
       }
-      result.second = vector_diff;
+      //Add extra weldingcost
+      result.second = vector_diff + end.getWeldingCost();
     }
 
     result.first = true;

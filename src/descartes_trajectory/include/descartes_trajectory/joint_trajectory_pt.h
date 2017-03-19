@@ -133,6 +133,10 @@ public:
                              std::vector<std::vector<double> > &joint_poses) const;
   /** @} (end section) */
 
+  virtual void getJointPoses(const descartes_core::RobotModel &model,
+                             std::vector<std::vector<double> > &joint_poses,
+                             std::vector<double> &costs) const;
+
   // TODO complete
   virtual bool isValid(const descartes_core::RobotModel &model) const;
 
@@ -177,11 +181,22 @@ public:
     return lower_;
   }
 
+  double getWeldingCost() const
+  {
+    return weldingCost;
+  }
+
+  void setWeldingCost(double newCost)
+  {
+    weldingCost = newCost;
+  }
+
 protected:
   std::vector<double> nominal_;
   std::vector<double> lower_;
   std::vector<double> upper_;
   std::vector<double> discretization_; /**<@brief How finely to discretize each joint */
+  double weldingCost = 0.0;
 
   /** @name JointTrajectoryPt transforms. Used in get*CartPose() methods and for interpolation.
    *  @{

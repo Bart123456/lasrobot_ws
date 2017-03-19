@@ -30,6 +30,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include "descartes_trajectory/cart_trajectory_pt.h"
 #include <descartes_core/utils.h>
+#include <cmath>
 
 #define NOT_IMPLEMENTED_ERR(ret)                                                                                       \
   logError("%s not implemented", __PRETTY_FUNCTION__);                                                                 \
@@ -233,6 +234,38 @@ bool CartTrajectoryPt::computeCartesianPoses(EigenSTL::vector_Affine3d &poses) c
   return !poses.empty();
 }
 
+double CartTrajectoryPt::computeWeldingCost(Eigen::Affine3d referencePose, Eigen::Affine3d pose) const
+{
+  /*
+  Poses are supposed to only differ in rotation matrix, the translations should be the same,
+  unless a certain position tolerance is used.
+  The reference pose is supposed to be the optimal solution, any extra rotations will result in cost increase.
+  Because of the convention used, there are two welding angles:
+    1) rotation around the local Y-axis, the most critical rotation in terms of weld quality
+    2) rotation around the local X-axis
+  */
+  double costFactorX = 1.0;
+  double costFactorY = 10.0;
+  double cost;
+
+  
+  //Since translations are supposed to be the same, the result is supposed to be a rotation only transform
+  Eigen::Vector3d zeroVec(0.0,0.0,0.0);
+  pose.translation() = zeroVec;
+  referencePose.translation() = zeroVec;
+
+  //First we apply the inverse transformation of the referencePose on "pose" (inverse rotation)
+  Eigen::Affine3d inverse;
+  inverse = referencePose.inverse() * pose;
+
+  //Now extract the euler angles:
+  Eigen::Vector3d xyzAngles;
+  xyzAngles = inverse.rotation().eulerAngles(0,1,2);
+
+  cost = costFactorX * std::abs(xyzAngles[0]) + costFactorY * std::abs(xyzAngles[1]);
+  return cost;
+}
+
 void CartTrajectoryPt::getCartesianPoses(const RobotModel &model, EigenSTL::vector_Affine3d &poses) const
 {
   EigenSTL::vector_Affine3d all_poses;
@@ -383,6 +416,42 @@ void CartTrajectoryPt::getJointPoses(const RobotModel &model, std::vector<std::v
       if (model.getAllIK(pose, local_joint_poses))
       {
         joint_poses.insert(joint_poses.end(), local_joint_poses.begin(), local_joint_poses.end());
+      }
+    }
+  }
+  else
+  {
+    ROS_ERROR("Failed for find ANY cartesian poses");
+  }
+
+  if (joint_poses.empty())
+  {
+    ROS_WARN("Failed for find ANY joint poses, returning");
+  }
+  else
+  {
+    ROS_DEBUG_STREAM("Get joint poses, sampled: " << poses.size() << ", with " << joint_poses.size()
+                                                  << " valid(returned) poses");
+  }
+}
+
+void CartTrajectoryPt::getJointPoses(const descartes_core::RobotModel &model, std::vector<std::vector<double> > &joint_poses, std::vector<double> &costs) const
+{
+  joint_poses.clear();
+
+  EigenSTL::vector_Affine3d poses;
+  if (computeCartesianPoses(poses))
+  {
+    poses.reserve(poses.size());
+    costs.reserve(poses.size());
+    Eigen::Affine3d referencePose = wobj_base_.frame * wobj_pt_.frame * tool_pt_.frame_inv * tool_base_.frame_inv;
+    for (const auto &pose : poses)
+    {
+      std::vector<std::vector<double> > local_joint_poses;
+      if (model.getAllIK(pose, local_joint_poses))
+      {
+        joint_poses.insert(joint_poses.end(), local_joint_poses.begin(), local_joint_poses.end());
+        costs.push_back(std::abs(computeWeldingCost(referencePose, pose)));
       }
     }
   }

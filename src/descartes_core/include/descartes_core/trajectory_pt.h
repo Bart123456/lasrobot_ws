@@ -140,6 +140,10 @@ public:
   virtual void getJointPoses(const RobotModel &model, std::vector<std::vector<double> > &joint_poses) const = 0;
   /** @} (end section) */
 
+  virtual void getJointPoses(const descartes_core::RobotModel &model,
+                             std::vector<std::vector<double> > &joint_poses,
+                             std::vector<double> &costs) const = 0;
+
   /**@brief Check if state satisfies trajectory point requirements.
    * @param model Robot model  object used to determine validity
    */
