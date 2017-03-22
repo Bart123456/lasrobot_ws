@@ -256,23 +256,31 @@ double CartTrajectoryPt::computeWeldingCost(Eigen::Affine3d referencePose, Eigen
   double cost;
   
   //Since translations are supposed to be the same, the result is supposed to be a rotation only transform
+  
   Eigen::Vector3d zeroVec(0.0,0.0,0.0);
   pose.translation() = zeroVec;
   referencePose.translation() = zeroVec;
 
+  //We transform the 'pose' with the inverse of the referencePose transform:
+  Eigen::Affine3d revertedPose;
+  revertedPose = referencePose.inverse() * pose;
+  //This 'revertedPose' transform now represents a rotation of the origin frame.
+  //The reference frame is now the origin frame:
+  //referencePose = referencePose.inverse() * referencePose; //Should be identity; this step is actually useless
+
   //Calculate Z-axis of pose- and referenceframe:
   Eigen::Vector3d axisZ(0.0,0.0,1.0);
   Eigen::Vector3d poseZ;
-  poseZ = pose * axisZ;
-  Eigen::Vector3d referenceZ;
-  referenceZ = referencePose * axisZ;
+  poseZ = revertedPose * axisZ;
 
   //To calculate the projection of poseZ in the X-Z-plane of the reference frame we set its Y-component to zero:
-  Eigen::Vector3d projectionZ(poseZ(0), poseZ(1), 0.0);
+  //We can do this because the referencePose transform is now an identity transform.
+  Eigen::Vector3d projectionZ(poseZ[0], 0.0, poseZ[2]);
+
 
   //Now calculate the rotation angles using dot products:
   double xRotation, yRotation;
-  yRotation = acos(referenceZ.dot(projectionZ) / (referenceZ.norm() * projectionZ.norm()));
+  yRotation = acos(axisZ.dot(projectionZ) / projectionZ.norm());
   xRotation = acos(poseZ.dot(projectionZ) / (poseZ.norm() * projectionZ.norm()));
 
   cost = costFactorX * std::abs(xRotation) + costFactorY * std::abs(yRotation);
