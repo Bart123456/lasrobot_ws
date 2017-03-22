@@ -26,6 +26,7 @@ namespace trajvis
 		private:
 		TrajectoryVec trajvec;
 		std::vector<visualization_msgs::Marker> markervec;
+		double rotStepSize = M_PI / 12;
 		public:
 		visualizedTrajectory(){};
 		
@@ -41,6 +42,18 @@ namespace trajvis
 		
 		void addPoint(Eigen::Affine3d pose, ToleranceOption TO);
 
+		void addTolerancedPoint(Eigen::Affine3d pose, double rx, double ry, double rz);
+
+		double getRotStepSize()
+		{
+			return rotStepSize;
+		}
+
+		void setRotStepSize(double newSize)
+		{
+			rotStepSize = newSize;
+		}
+
 		private:
 		//Generates a toleranced cartesian point from a pose
 		descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, 
@@ -49,6 +62,9 @@ namespace trajvis
 																		double rotX, 
 																		double rotY, 
 																		double rotZ);
+
+		descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	Eigen::Affine3d pose,
+																		double rxTolerance, double ryTolerance, double rzTolerance);
 		
 		//Generates a cartesian point with free rotation about the Z axis of the EFF frame
 		descartes_core::TrajectoryPtPtr makeAxialSymmetricPoint(double x, double y, double z, double rx, double ry, double rz);
@@ -63,7 +79,8 @@ namespace trajvis
 		//Define function for easy marker creation
 		visualization_msgs::Marker createMarker(double transX, double transY, double transZ, double rotX, double rotY, double rotZ,
 												descartes_trajectory::AxialSymmetricPt::FreeAxis axis);
-		
+
+		void createVisualFrame(Eigen::Affine3d pose);
 	};
 }
 
