@@ -123,14 +123,21 @@ int main(int argc, char** argv)
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
+  poses = poseGeneration::circle(centerPose, 0.054, 10, -(M_PI / 4), 2 * M_PI);
 
   int tempSize;
   tempSize = poses.size();
 
+  trajectory.setRotStepSize(M_PI/12);
+  double rxTolerance, ryTolerance, rzTolerance;
+  rxTolerance = M_PI/4;
+  ryTolerance = M_PI/4;
+  rzTolerance = 2*M_PI;
+
   for(int i = 0; i < tempSize; ++i)
   {
-    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+    //trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+    trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
   }
   
   //Get both the trajectory and the markers
