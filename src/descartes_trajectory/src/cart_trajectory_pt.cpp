@@ -49,7 +49,7 @@ EigenSTL::vector_Affine3d uniform(const TolerancedFrame &frame, const double ori
 
   if (pos_increment < 0.0 || orient_increment < 0.0)
   {
-    ROS_WARN_STREAM("Negative position/orientation intcrement: " << pos_increment << "/" << orient_increment);
+    ROS_WARN_STREAM("Negative position/orientation increment: " << pos_increment << "/" << orient_increment);
     rtn.clear();
     return rtn;
   }
@@ -243,26 +243,39 @@ double CartTrajectoryPt::computeWeldingCost(Eigen::Affine3d referencePose, Eigen
   Because of the convention used, there are two welding angles:
     1) rotation around the local Y-axis, the most critical rotation in terms of weld quality
     2) rotation around the local X-axis
+
+  The problem now is to find those angles given a reference pose and a new, rotated 'pose'.
+  Method: we calculate the Z-axis of the rotated 'pose'.
+  Then this Z-axis is projected onto the X-Z-plane of the reference pose. Call this vector 'projectionZ'.
+  This projectionZ can then be used to calculate the Y- and X-rotation-angles, using vector dot products:
+    1) the dot product between 'projectionZ' and the Z-axis of the referencepose defines the Y-rotation-angle
+    2) the dot product between 'projectionZ' and the Z-axis of the rotated 'pose' defines the X-rotation-angle.
   */
   double costFactorX = 1.0;
   double costFactorY = 10.0;
   double cost;
-
   
   //Since translations are supposed to be the same, the result is supposed to be a rotation only transform
   Eigen::Vector3d zeroVec(0.0,0.0,0.0);
   pose.translation() = zeroVec;
   referencePose.translation() = zeroVec;
 
-  //First we apply the inverse transformation of the referencePose on "pose" (inverse rotation)
-  Eigen::Affine3d inverse;
-  inverse = referencePose.inverse() * pose;
+  //Calculate Z-axis of pose- and referenceframe:
+  Eigen::Vector3d axisZ(0.0,0.0,1.0);
+  Eigen::Vector3d poseZ;
+  poseZ = pose * axisZ;
+  Eigen::Vector3d referenceZ;
+  referenceZ = referencePose * axisZ;
 
-  //Now extract the euler angles:
-  Eigen::Vector3d xyzAngles;
-  xyzAngles = inverse.rotation().eulerAngles(0,1,2);
+  //To calculate the projection of poseZ in the X-Z-plane of the reference frame we set its Y-component to zero:
+  Eigen::Vector3d projectionZ(poseZ(0), poseZ(1), 0.0);
 
-  cost = costFactorX * std::abs(xyzAngles[0]) + costFactorY * std::abs(xyzAngles[1]);
+  //Now calculate the rotation angles using dot products:
+  double xRotation, yRotation;
+  yRotation = acos(referenceZ.dot(projectionZ) / (referenceZ.norm() * projectionZ.norm()));
+  xRotation = acos(poseZ.dot(projectionZ) / (poseZ.norm() * projectionZ.norm()));
+
+  cost = costFactorX * std::abs(xRotation) + costFactorY * std::abs(yRotation);
   return cost;
 }
 
@@ -451,7 +464,14 @@ void CartTrajectoryPt::getJointPoses(const descartes_core::RobotModel &model, st
       if (model.getAllIK(pose, local_joint_poses))
       {
         joint_poses.insert(joint_poses.end(), local_joint_poses.begin(), local_joint_poses.end());
-        costs.push_back(std::abs(computeWeldingCost(referencePose, pose)));
+        //For every joint solution found we need to add the cost once:
+        int counter = 0;
+        while(counter < local_joint_poses.size())
+        {
+          costs.push_back(computeWeldingCost(referencePose, pose));
+          ++counter;
+        }
+
       }
     }
   }
