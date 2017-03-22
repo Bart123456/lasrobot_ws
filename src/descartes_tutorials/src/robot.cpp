@@ -9,9 +9,9 @@
 #include <descartes_moveit/moveit_state_adapter.h>
 
 //Includes for collision objects
-#include <moveit/move_group_interface/move_group.h>
+//#include <moveit/move_group_interface/move_group.h>
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
-#include <geometric_shapes/shape_operations.h>
+//#include <geometric_shapes/shape_operations.h>
 
 
 // Includes the planner we will be using
@@ -49,7 +49,7 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 //Creates a collision object from a mesh
 moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose);
 
-
+//====================================================================
 int main(int argc, char** argv)
 {
   // Initialize ROS
@@ -74,33 +74,34 @@ int main(int argc, char** argv)
   Eigen::Vector3d tablescale(1.0,1.0,1.0);
   Eigen::Affine3d tablepose;
   tablepose = descartes_core::utils::toFrame(0.3, -0.6, 0.1, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
-  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", tablescale, "Table", tablepose));
+  planning_scene.world.collision_objects.push_back(collisionObjectScene::makeCollisionObject("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", tablescale, "Table", tablepose));
   
-  //Welding workobject
-  Eigen::Vector3d objectscale(0.001,0.001,0.001);
-  Eigen::Affine3d objectpose;
-  
-  double objectX, objectY, objectZ, objectrX, objectrY, objectrZ;
-  std::string objectID;
-  objectID = "tube_on_plate";
-  objectX = 0.8;
-  objectY = 0.0;
-  objectZ = 0.112;
-  objectrX = 0.0;
-  objectrY = 0.0;
-  objectrZ = 0.0;
-  
+  //Welding objects (work objects)
 
-  objectpose = descartes_core::utils::toFrame(objectX, objectY, objectZ, objectrX, objectrY, objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  planning_scene.world.collision_objects.push_back(makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, objectID, objectpose));
+  //create a vector for saving the workobjects
+  std::vector<collisionObjectScene::workObject> worklist;
   
+  // define and create the workobj#ifndef Included_NameModel_H
+  collisionObjectScene::workObject tube1;
+  // make the workobject of a certain objecttype and calculate the weldingtraject
+  tube1.makeTubeOnPlate(0.8, 0.0, 0.112, 0.0, 0.0, 0.0, 51, 36, 0, 2* M_PI);
+
+  // push the workobject to the vector
+  worklist.push_back(tube1);
+
+  // iterate the vector
+  for(std::vector<collisionObjectScene::workObject>::iterator it = worklist.begin(); it != worklist.end(); ++it) {
+    planning_scene.world.collision_objects.push_back(tube1.getCollisionObject());
+  }
+  
+ 
   //Planning scene colors
   planning_scene.object_colors.resize(1);
   planning_scene.object_colors[0].color.r = 0.5;
   planning_scene.object_colors[0].color.g = 0.5;
   planning_scene.object_colors[0].color.b = 0.5;
   planning_scene.object_colors[0].color.a = 1.0;
-  planning_scene.object_colors[0].id = objectID;
+  //planning_scene.object_colors[0].id = ;
 
 
   //Define publisher
@@ -311,7 +312,7 @@ int main(int argc, char** argv)
   ROS_INFO("Done!");
   return 0;
 } //main
-
+//===============================================================================
 trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory,
                      const descartes_core::RobotModel& model,
@@ -393,44 +394,6 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout)
             break;
     }
     return pub.getNumSubscribers() > 0;
-}
-
-moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose)
-{
-  moveit_msgs::CollisionObject co;
-
-  ROS_INFO("Loading mesh");
-  shapes::Mesh* m = shapes::createMeshFromResource(filepath, scale);
-  ROS_INFO("Mesh loaded");
-
-  shape_msgs::Mesh mesh;
-  shapes::ShapeMsg mesh_msg;
-  shapes::constructMsgFromShape(m, mesh_msg);
-  mesh = boost::get<shape_msgs::Mesh>(mesh_msg);
-
-  Eigen::Vector3d translations;
-  translations = pose.translation();
-  Eigen::Vector3d rotationsXYZ;
-  rotationsXYZ = pose.rotation().eulerAngles(0,1,2);
-  Eigen::Quaternion<double> quat;
-  quat = utilities::eulerToQuat(rotationsXYZ[0], rotationsXYZ[1], rotationsXYZ[2]);
-
-  co.header.frame_id = "base_link";
-  co.id = ID;
-  co.meshes.resize(1);
-  co.mesh_poses.resize(1);
-  co.meshes[0] = mesh;
-  co.mesh_poses[0].position.x = translations[0];
-  co.mesh_poses[0].position.y = translations[1];
-  co.mesh_poses[0].position.z = translations[2];
-  co.mesh_poses[0].orientation.w= quat.w();
-  co.mesh_poses[0].orientation.x= quat.x();
-  co.mesh_poses[0].orientation.y= quat.y();
-  co.mesh_poses[0].orientation.z= quat.z();
-
-  co.operation = co.ADD;
-
-  return co;
 }
 
 
