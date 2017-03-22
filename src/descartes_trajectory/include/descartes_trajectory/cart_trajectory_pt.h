@@ -281,6 +281,10 @@ public:
   // TODO complete
   virtual void getJointPoses(const descartes_core::RobotModel &model,
                              std::vector<std::vector<double> > &joint_poses) const;
+
+  virtual void getJointPoses(const descartes_core::RobotModel &model,
+                             std::vector<std::vector<double> > &joint_poses,
+                             std::vector<double> &costs) const;
   /** @} (end section) */
 
   // TODO complete
@@ -311,6 +315,7 @@ public:
 
 protected:
   bool computeCartesianPoses(EigenSTL::vector_Affine3d &poses) const;
+  double computeWeldingCost(Eigen::Affine3d referencePose, Eigen::Affine3d pose) const;
 
 protected:
   descartes_core::Frame tool_base_; /**<@brief Fixed transform from wrist/tool_plate to tool base. */
