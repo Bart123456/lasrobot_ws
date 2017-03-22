@@ -1,0 +1,171 @@
+<robot name="robot1">
+//////////////////////////////////////////////////////////////////////////////////
+	<link name= "base_link">
+	 <visual> 
+    	<origin xyz="0 0 0" rpy="0 0 0" /> 
+    	<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Base.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </visual> 
+ 	 <collision> 
+   		<origin xyz="0 0 0" rpy="0 0 0" /> 
+   		<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Base.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </collision> 
+	</link>
+///////////////////////////////////////////////////////////////////////////////////
+	<link name= "link2">
+	 <visual> 
+    	<origin xyz="0 0 -0.225" rpy="0 0 0" /> 
+    	<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </visual> 
+ 	 <collision> 
+   		<origin xyz="0 0 -0.225" rpy="0 0 0" /> 
+   		<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </collision> 
+	</link>
+///////////////////////////////////////////////////////////////////////////////////
+	<link name= "link3">
+	 <visual> 
+    	<origin xyz="-0.180 0 -1.0" rpy="0 0 0" /> 
+    	<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link3.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </visual> 
+ 	 <collision> 
+   		<origin xyz=-0.180 0 -1.0" rpy="0 0 0" /> 
+   		<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link3.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </collision> 
+	</link>
+//////////////////////////////////////////////////////////////////////////////////
+	<link name= "link4">
+	 <visual> 
+    	<origin xyz="-0.180 0 -0.400" rpy="0 0 0" /> 
+    	<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link2.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </visual> 
+ 	 <collision> 
+   		<origin xyz="-0.180 0 -0.400" rpy="0 0 0" /> 
+   		<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link2.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </collision> 
+	</link>
+///////////////////////////////////////////////////////////////////////////////////
+	<link name= "link5">
+	 <visual> 
+    	<origin xyz="-0.5835 0 -1.12" rpy="0 0 0" /> 
+    	<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link4.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </visual> 
+ 	 <collision> 
+   		<origin xyz="-0.5835 0 -1.12" rpy="0 0 0" /> 
+   		<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link4.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </collision> 
+	</link>
+////////////////////////////////////////////////////////////////////////////////////
+	<link name= "link6">
+	 <visual> 
+    	<origin xyz="-0.800 0 -1.12" rpy="0 0 0" /> 
+    	<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link5.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </visual> 
+ 	 <collision> 
+   		<origin xyz="-0.800 0 -1.12" rpy="0 0 0" /> 
+   		<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link5.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </collision> 
+	</link>
+///////////////////////////////////////////////////////////////////////////////////
+	<link name= "link7">
+	 <visual> 
+    	<origin xyz="-0.9088 0 -1.12" rpy="0 0 0" /> 
+    	<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link6.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </visual> 
+ 	 <collision> 
+   		<origin xyz="-0.9088 0 -1.12" rpy="0 0 0" /> 
+   		<geometry> 
+      		<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link6.stl" 
+		scale=".001 .001 .001"/> 
+     	</geometry> 
+ 	 </collision> 
+	</link>
+
+	<joint name="joint1" type="revolute">
+   		<parent link="base_link"/>
+   		<child link="link2"/>
+		<origin xyz="0 0 0.225" rpy="0 0 0" />
+		<axis xyz="0 0 -1" />
+ 	</joint>
+
+	<joint name="joint2" type="revolute">
+   		<parent link="link2"/>
+   		<child link="link3"/>
+		<origin xyz="0.180 0 0.175" rpy="0 0 0" />
+  		<axis xyz="0 1 0" />
+ 	</joint>
+
+	<joint name="joint3" type="revolute">
+   		<parent link="link3"/>
+   		<child link="link4"/>
+		<origin xyz="0 0 0.600" rpy="0 0 0" />
+		<axis xyz="0 1 0" />
+ 	</joint>
+
+	<joint name="joint4" type="revolute">
+   		<parent link="link4"/>
+   		<child link="link5"/>
+		<origin xyz="0.4035 0 0.120" rpy="0 0 0" />
+		<axis xyz="-1 0 0" />
+ 	</joint>
+
+	<joint name="joint5" type="revolute">
+   		<parent link="link5"/>
+   		<child link="link6"/>
+		<origin xyz="0.2165 0 0" rpy="0 0 0" />
+		<axis xyz="0 1 0" />
+ 	</joint>
+
+	<joint name="joint6" type="fixed">
+   		<parent link="link6"/>
+   		<child link="link7"/>
+		<origin xyz="0.1088 0 0" rpy="0 0 0" />
+		<axis xyz="-1 0 0" />
+ 	</joint>
+
+</robot>
+
+
+
+
+
+
+

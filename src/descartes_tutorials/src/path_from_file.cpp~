@@ -1,0 +1,497 @@
+// Core ros functionality like ros::init and spin
+#include <ros/ros.h>
+// ROS Trajectory Action server definition
+#include <control_msgs/FollowJointTrajectoryAction.h>
+// Means by which we communicate with above action-server
+#include <actionlib/client/simple_action_client.h>
+// Includes the descartes robot model we will be using
+#include <descartes_moveit/moveit_state_adapter.h>
+// Includes the descartes trajectory type we will be using
+#include <descartes_trajectory/axial_symmetric_pt.h>
+#include <descartes_trajectory/cart_trajectory_pt.h>
+// Includes the planner we will be using
+#include <descartes_planner/dense_planner.h>
+//Include Eigen geometry header for rotations
+#include </usr/include/eigen3/Eigen/Geometry>
+//Include visualization markers for RViz
+#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
+// Includes for using csv file
+#include <iostream>
+#include <algorithm>
+#include <istream>
+#include <fstream>
+#include <sstream>
+// Includes used functions
+#include "path_from_file.h"
+
+/** CHANGES 09/03/2017
+*
+* changed lay-out
+* added header file
+* added functions for using an csv file
+*/
+
+
+////// DECLARATIONS //////
+
+typedef std::vector<descartes_core::TrajectoryPtPtr> TrajectoryVec;
+typedef TrajectoryVec::const_iterator TrajectoryIter;
+
+
+////// MAIN //////
+
+int main(int argc, char** argv)
+{
+	// Initialize ROS
+  	ros::init(argc, argv, "robot");
+  	ros::NodeHandle nh;
+
+  	// Required for communication with moveit components
+  	ros::AsyncSpinner spinner (1);
+ 	spinner.start();
+  
+  	// 1. Define the vectors for the trajectorypoints
+  	TrajectoryVec points;
+  	visualization_msgs::Marker marker;
+  	std::vector<visualization_msgs::Marker> markerVec;
+
+
+  	// 2. Start the publisher for the Rviz Markers
+  	ros::Publisher vis_pub = nh.advertise<visualization_msgs::MarkerArray>  ( "visualization_marker_array", 1 );
+  
+
+	// 3. Create trajectorypoints
+  	for (unsigned int i = 0; i < 10; ++i)
+  	{
+  		marker = createMarker(0.8, 0.3, 0.6 + i * 0.01, 0, M_PI / 2, 0);
+  		markerVec.push_back(marker);
+    	points.push_back(addPose(0.8, 0.3, 0.6 + i * 0.01, 0, M_PI / 2, 0, true));
+  	}
+  
+  	for (unsigned int i = 0; i < 10; ++i)
+ 	{
+  		markerVec.push_back(createMarker(0.8, 0.3, 0.7, 0, (M_PI / 2) + i * 0.1, 0));
+    	points.push_back(addPose(0.8, 0.3, 0.7, 0, (M_PI / 2) + i * 0.1, 0, true));
+  	}
+
+
+  	//4. Copy vector to array so we can publish it as a MarkerArray type.
+  	int size = markerVec.size();
+	visualization_msgs::MarkerArray ma;
+  	ma.markers.resize(size);
+  	for(int i = 0;i < size;i++)
+  	{
+    	ma.markers[i] = markerVec[i];
+  	}
+  
+
+  	//5. Wait for subscriber and publish the markerArray once the subscriber is found.
+  	ros::Rate loop_rate(10);
+  	ROS_INFO("Waiting for subscribers.");
+  	if(waitForSubscribers(vis_pub, ros::Duration(2.0)))
+  	{
+  		ROS_INFO("Subscriber found, publishing markers.");
+  		vis_pub.publish(ma);
+		ros::spinOnce();
+		loop_rate.sleep();
+  	} 
+	else {ROS_ERROR("No subscribers connected, markers not published");}
+    		
+ 
+	//6. Create a robot model and initialize it
+  	descartes_core::RobotModelPtr model (new descartes_moveit::MoveitStateAdapter);
+  	//Enable collision checking
+  	model->setCheckCollisions(true);
+  	// Name of description on parameter server. Typically just "robot_description".
+  	const std::string robot_description = "robot_description";
+  	// name of the kinematic group you defined when running MoveitSetupAssistant
+  	const std::string group_name = "robotarm";
+  	// Name of frame in which you are expressing poses. Typically "world_frame" or "base_link".
+  	const std::string world_frame = "base_link";
+  	// tool center point frame (name of link associated with tool)
+  	const std::string tcp_frame = "endpoint";
+
+  	if (!model->initialize(robot_description, group_name, world_frame, tcp_frame))
+  	{
+    	ROS_INFO("Could not initialize robot model");
+    	return -1;
+  	}
+
+
+	// 7. Create a planner and initialize it with our robot model
+  	descartes_planner::DensePlanner planner;
+  	planner.initialize(model);
+
+
+	// 8. Feed the trajectory to the planner
+  	if (!planner.planPath(points))
+  	{
+    	ROS_ERROR("Could not solve for a valid path");
+    	return -2;
+  	}
+
+  	TrajectoryVec result;
+  	if (!planner.getPath(result))
+  	{
+    	ROS_ERROR("Could not retrieve path");
+    	return -3;
+  	}
+
+
+	// 9. Translate the result into a type that ROS understands
+  	// Get Joint Names
+  	std::vector<std::string> names;
+  	nh.getParam("controller_joint_names", names);
+  	// Generate a ROS joint trajectory with the result path, robot model, given joint names,
+ 	// a certain time delta between each trajectory point
+  	trajectory_msgs::JointTrajectory joint_solution = toROSJointTrajectory(result, *model, names, 1.0);
+
+
+	// 10. Send the ROS trajectory to the robot for execution
+	while(ros::ok()) 
+	{
+		if (!executeTrajectory(joint_solution))
+		{
+		  ROS_ERROR("Could not execute trajectory!");
+		  return -4;
+		}
+	}
+  	//Wait till user kills the process (Control-C)
+  		ROS_INFO("Done!");
+  		return 0;
+
+}
+
+
+////// functions //////
+
+/**
+*Creates pose that can be added to the TrajectoryVec vector.
+*/
+descartes_core::TrajectoryPtPtr addPose(double transX, double transY, double transZ, double rotX, double rotY, double rotZ, bool symmetric)
+{
+	//Define the pose
+	Eigen::Affine3d pose;
+	//Convert Affine3f to Affine3d
+	//Eigen::Affine3d pose_d = pose.cast<double>();
+	descartes_core::TrajectoryPtPtr pt;
+	if(symmetric){
+		//Convert to axialsymmetric point
+		pt = makeAxialSymmetricPoint(transX, transY, transZ, rotX, rotY, rotZ); 
+	} else {
+		pt = makeTolerancedCartesianPoint(transX, transY, transZ, rotX, rotY, rotZ);
+	}
+	return pt;
+}
+
+/**
+*Generates a toleranced cartesian point from a pose
+*/
+descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, double transY, double transZ, double rotX, double rotY, 																	double rotZ)
+{
+	using namespace descartes_core;
+	using namespace descartes_trajectory;
+	Eigen::Affine3d pose = utils::toFrame(transX, transY, transZ, rotX, rotY, rotZ, utils::EulerConventions::XYZ);
+	
+	descartes_trajectory::PositionTolerance p;
+	p = ToleranceBase::zeroTolerance<PositionTolerance>(transX, transY, transZ);
+	descartes_trajectory::OrientationTolerance o;
+	o = ToleranceBase::createSymmetric<OrientationTolerance>(rotX, rotY, rotZ, 0, 0, 2*M_PI);
+	return TrajectoryPtPtr( new CartTrajectoryPt( TolerancedFrame(pose, p, o), 0.0, M_PI/12) );
+}
+
+/**
+*Generates a cartesian point with free rotation about the Z axis of the EFF frame
+*/
+descartes_core::TrajectoryPtPtr makeAxialSymmetricPoint(double x, double y, double z, double rx, double ry, double rz)
+{
+  using namespace descartes_core;
+  using namespace descartes_trajectory;
+  return TrajectoryPtPtr( new AxialSymmetricPt(x, y, z, rx, ry, rz, M_PI/12, AxialSymmetricPt::Z_AXIS) );
+}
+
+/**
+*Translates a descartes trajectory to a ROS joint trajectory
+*/
+trajectory_msgs::JointTrajectory
+toROSJointTrajectory(const TrajectoryVec& trajectory,
+                     const descartes_core::RobotModel& model,
+                     const std::vector<std::string>& joint_names,
+                     double time_delay)
+{
+
+	// Fill out information about our trajectory
+  	trajectory_msgs::JointTrajectory result;
+  	result.header.stamp = ros::Time::now();
+  	result.header.frame_id = "world_frame";
+ 	result.joint_names = joint_names;
+  	// For keeping track of time-so-far in the trajectory
+  	double time_offset = 0.0;
+  	// Loop through the trajectory
+  	for (TrajectoryIter it = trajectory.begin(); it != trajectory.end(); ++it)
+  	{
+    	// Find nominal joint solution at this point
+    	std::vector<double> joints;
+    	it->get()->getNominalJointPose(std::vector<double>(), model, joints);
+    	// Fill out a ROS trajectory point
+    	trajectory_msgs::JointTrajectoryPoint pt;
+    	pt.positions = joints;
+    	// velocity, acceleration, and effort are given dummy values
+    	// we'll let the controller figure them out
+    	pt.velocities.resize(joints.size(), 0.0);
+    	pt.accelerations.resize(joints.size(), 0.0);
+    	pt.effort.resize(joints.size(), 0.0);
+    	// set the time into the trajectory
+    	pt.time_from_start = ros::Duration(time_offset);
+    	// increment time
+    	time_offset += time_delay;
+		// push points
+    	result.points.push_back(pt);
+  	}
+  	return result;
+}
+
+/**
+*Sends a ROS trajectory to the robot controller
+*/
+bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory)
+{
+	// Create a Follow Joint Trajectory Action Client
+  	actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> ac("joint_trajectory_action", true);
+  	ROS_INFO("Waiting for action server to start.");
+  	if (!ac.waitForServer(ros::Duration(2.0)))
+  	{
+    	ROS_ERROR("Could not connect to action server");
+    	return false;
+  	}
+  	ROS_INFO("Action server started.");
+
+  	control_msgs::FollowJointTrajectoryGoal goal;
+  	goal.trajectory = trajectory;
+  	goal.goal_time_tolerance = ros::Duration(1.0);
+  
+  	ac.sendGoal(goal);
+
+  	if (ac.waitForResult(goal.trajectory.points[goal.trajectory.points.size()-1].time_from_start + ros::Duration(5)))
+  	{
+    	ROS_INFO("Action server reported successful execution");
+    	return true;
+  	} 
+	else 
+	{
+		ROS_WARN("Action server could not execute trajectory");
+    	return false; 
+  	}
+}
+
+/**
+*Function for easily defining poses
+*/
+Eigen::Affine3d definePose(double transX, double transY, double transZ, double rotX, double rotY, double rotZ)
+{
+  	Eigen::Matrix3d m;
+	m = Eigen::AngleAxisd(rotX, Eigen::Vector3d::UnitX())
+		* Eigen::AngleAxisd(rotY, Eigen::Vector3d::UnitY())
+		* Eigen::AngleAxisd(rotZ, Eigen::Vector3d::UnitZ());
+	
+	Eigen::Affine3d pose;
+	pose = Eigen::Translation3d(transX, transY, transZ);
+	pose.linear() = m;
+	
+	return pose;	
+}
+
+/**
+*Function for constructing quaternion starting from Euler rotations XYZ
+*/
+Eigen::Quaternion<double> eulerToQuat(double rotX, double rotY, double rotZ)
+{
+  	Eigen::Matrix3d m;
+	m = Eigen::AngleAxisd(rotX, Eigen::Vector3d::UnitX())
+	  * Eigen::AngleAxisd(rotY, Eigen::Vector3d::UnitY())
+	  * Eigen::AngleAxisd(rotZ, Eigen::Vector3d::UnitZ());
+	
+	Eigen::AngleAxis<double> aa;
+	aa = Eigen::AngleAxisd(m);
+	
+	Eigen::Quaternion<double> quat;
+	quat = Eigen::Quaternion<double>(aa);
+	return quat;
+}
+
+/**
+*Define function for easy marker creation
+*/
+visualization_msgs::Marker createMarker(double transX, double transY, double transZ, double rotX, double rotY, double rotZ)
+{
+	static int count;
+  	visualization_msgs::Marker marker;
+	marker.header.frame_id = "base_link";
+	marker.header.stamp = ros::Time();
+	marker.ns = "my_namespace";
+	marker.id = count;
+	marker.type = visualization_msgs::Marker::ARROW;
+	marker.action = visualization_msgs::Marker::ADD;
+	marker.lifetime = ros::Duration(0);
+	
+	marker.pose.position.x = transX;
+	marker.pose.position.y = transY;
+	marker.pose.position.z = transZ;
+	
+	//To calculate the quaternion values we first define an AngleAxis object using Euler rotations, then convert it
+	Eigen::Quaternion<double> quat;
+	quat = eulerToQuat(rotX, rotY, rotZ);
+	
+	marker.pose.orientation.x = quat.x();
+	marker.pose.orientation.y = quat.y();
+	marker.pose.orientation.z = quat.z();
+	marker.pose.orientation.w = quat.w();
+	marker.scale.x = 0.1;
+	marker.scale.y = 0.01;
+	marker.scale.z = 0.01;
+	marker.color.a = 1.0;	//Alpha
+	marker.color.r = 1.0;
+	marker.color.g = 0.0;
+	marker.color.b = 0.0;
+	count++;
+	return marker;
+}
+
+/**
+* Function to read the csv file
+*/
+std::vector<Pose> readFile(std::sstd::vector<Pose> readFile(std::string fileName) {
+    using namespace std;
+    cout << "Reading file: " << fileName << endl;
+
+    vector<Pose> path;
+
+    ifstream inf(fileName);
+    if (!inf) {
+        cerr << "Error in reading file." << endl;
+        exit(1);
+    }
+
+    int pi = 0; // point index
+    while (inf) {
+        // read one line of the data file
+        string oneLine;
+        getline(inf, oneLine);
+
+        // read data point if not empty (the end of the file)
+        if (!oneLine.empty()) {
+            // replace comma's with spaces for use as stringstream
+            replace(oneLine.begin(), oneLine.end(), ',', ' ');
+
+            // add extra path pose
+            path.push_back({0, 0, 0, 0, 0, 0});
+
+            // add new values to path vector using a stringstreamobject for convenience
+            stringstream ss(oneLine);
+            ss >> path[pi].x >> path[pi].y >> path[pi].z;
+            ss >> path[pi].alpha >> path[pi].beta >> path[pi].gamma;
+            pi += 1;
+
+            // print progress bar
+            cout << "=";
+        }
+    }
+    // next line after progress bar
+    cout << endl;
+
+    return path;
+}
+
+/**
+*Function to store the trajectorypoints in a vector
+*/
+std::vector<Eigen::Affine3d> poseToEigen(const std::vector<Pose> vPose) {
+
+    using namespace std;
+    int len = static_cast<int>(vPose.size());
+
+    // create vector to store result
+    vector<Eigen::Affine3d> result;
+
+    for (int pi=0; pi<len; ++pi) {
+        Eigen::Affine3d pose;
+
+        pose = Eigen::Translation3d(vPose[pi].x, vPose[pi].y, vPose[pi].z);
+        Eigen::Matrix3d m;
+        m = Eigen::AngleAxisd(vPose[pi].alpha * DEG_TO_RAD, Eigen::Vector3d::UnitX())
+            * Eigen::AngleAxisd(vPose[pi].beta * DEG_TO_RAD, Eigen::Vector3d::UnitY())
+            * Eigen::AngleAxisd(vPose[pi].gamma * DEG_TO_RAD, Eigen::Vector3d::UnitZ());
+
+        pose.linear() = m;
+
+        result.push_back(pose);
+    }
+
+    return result;
+}tring fileName) {
+    using namespace std;
+    cout << "Reading file: " << fileName << endl;
+
+    vector<Pose> path;
+
+    ifstream inf(fileName);
+    if (!inf) {
+        cerr << "Error in reading file." << endl;
+        exit(1);
+    }
+
+    int pi = 0; // point index
+    while (inf) {
+        // read one line of the data file
+        string oneLine;
+        getline(inf, oneLine);
+
+        // read data point if not empty (the end of the file)
+        if (!oneLine.empty()) {
+            // replace comma's with spaces for use as stringstream
+            replace(oneLine.begin(), oneLine.end(), ',', ' ');
+
+            // add extra path pose
+            path.push_back({0, 0, 0, 0, 0, 0});
+
+            // add new values to path vector using a stringstreamobject for convenience
+            stringstream ss(oneLine);
+            ss >> path[pi].x >> path[pi].y >> path[pi].z;
+            ss >> path[pi].alpha >> path[pi].beta >> path[pi].gamma;
+            pi += 1;
+
+            // print progress bar
+            cout << "=";
+        }
+    }
+    // next line after progress bar
+    cout << endl;
+
+    return path;
+}
+
+std::vector<Eigen::Affine3d> poseToEigen(const std::vector<Pose> vPose) {
+
+    using namespace std;
+    int len = static_cast<int>(vPose.size());
+
+    // create vector to store result
+    vector<Eigen::Affine3d> result;
+
+    for (int pi=0; pi<len; ++pi) {
+        Eigen::Affine3d pose;
+
+        pose = Eigen::Translation3d(vPose[pi].x, vPose[pi].y, vPose[pi].z);
+        Eigen::Matrix3d m;
+        m = Eigen::AngleAxisd(vPose[pi].alpha * DEG_TO_RAD, Eigen::Vector3d::UnitX())
+            * Eigen::AngleAxisd(vPose[pi].beta * DEG_TO_RAD, Eigen::Vector3d::UnitY())
+            * Eigen::AngleAxisd(vPose[pi].gamma * DEG_TO_RAD, Eigen::Vector3d::UnitZ());
+
+        pose.linear() = m;
+
+        result.push_back(pose);
+    }
+
+    return result;
+}
