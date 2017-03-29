@@ -51,8 +51,8 @@ bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory);
 //Used to wait for RViz to subscribe to the Marker topic before publishing them
 bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 
-bool readTrajectoryFile = true;
-bool writeTrajectoryFile = false;
+bool readTrajectoryFile = false;
+bool writeTrajectoryFile = true;
 std::string bagReadFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
 std::string bagWriteFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
 int main(int argc, char** argv)

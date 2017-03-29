@@ -53,8 +53,8 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 
 bool readTrajectoryFile = false;
 bool writeTrajectoryFile = true;
-std::string bagFilePath = "/home/jeroen/ros/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
-
+std::string bagReadFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
+std::string bagWriteFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
 int main(int argc, char** argv)
 {
   // Initialize ROS
@@ -76,9 +76,6 @@ int main(int argc, char** argv)
   //Used to store both cartesian waypoints and their visualization markers
   trajvis::visualizedTrajectory trajectory;
 
-  //Create collision objects
-  moveit_msgs::PlanningScene planning_scene;
-  utilities::addEnvironment(planning_scene);
   //Welding workobject
   Eigen::Vector3d objectscale(0.001,0.001,0.001);
   Eigen::Affine3d objectpose;
@@ -92,13 +89,35 @@ int main(int argc, char** argv)
   objectrX = 0.0;
   objectrY = 0.0;
   objectrZ = 0.0;
-  
 
-  objectpose = descartes_core::utils::toFrame(objectX, objectY, objectZ, objectrX, objectrY, objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  planning_scene.world.collision_objects.push_back(utilities::makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, objectID, objectpose));
-  
-  //Planning scene colors
-  planning_scene.object_colors.push_back(utilities::makeObjectColor(objectID, 0.5, 0.5, 0.5, 0.8));
+  moveit_msgs::PlanningScene planning_scene;
+  if(!readTrajectoryFile)
+  {
+    //Create collision objects
+    utilities::addEnvironment(planning_scene);
+
+
+    objectpose = descartes_core::utils::toFrame(objectX, objectY, objectZ, objectrX, objectrY, objectrZ, descartes_core::utils::EulerConventions::XYZ);
+    planning_scene.world.collision_objects.push_back(utilities::makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, objectID, objectpose));
+    
+    //Planning scene colors
+    planning_scene.object_colors.push_back(utilities::makeObjectColor(objectID, 0.5, 0.5, 0.5, 0.8));
+  } else {
+    rosbag::Bag bag2(bagReadFilePath, rosbag::bagmode::Read);
+    rosbag::View view(bag2, rosbag::TopicQuery("planningscene"));
+
+    BOOST_FOREACH(rosbag::MessageInstance const m, view)
+    {
+        moveit_msgs::PlanningScene::ConstPtr i = m.instantiate<moveit_msgs::PlanningScene>();
+        if (m.getTopic() == "planningscene")
+        {
+          planning_scene = *i;
+          ROS_INFO("Scene .bag file read.");
+        }
+    }
+    bag2.close();
+    ROS_INFO("Planning scene read");
+  }
 
   //Define publisher
   ros::Publisher planning_scene_diff_publisher;
@@ -123,14 +142,21 @@ int main(int argc, char** argv)
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
+  poses = poseGeneration::circle(centerPose, 0.054, 10, -(M_PI / 4), 2 * M_PI);
 
   int tempSize;
   tempSize = poses.size();
 
+  trajectory.setRotStepSize(M_PI/12);
+  double rxTolerance, ryTolerance, rzTolerance;
+  rxTolerance = M_PI/4;
+  ryTolerance = M_PI/4;
+  rzTolerance = 2*M_PI;
+
   for(int i = 0; i < tempSize; ++i)
   {
-    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+    //trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+    trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
   }
   
   //Get both the trajectory and the markers
@@ -192,7 +218,6 @@ int main(int argc, char** argv)
   // 3. Create a planner and initialize it with our robot model
   descartes_planner::DensePlanner planner;
   planner.initialize(model);
-  //planner.initialize(model, cost_function_callback) for a custom costfunction
 
   //Don't plan path if it is read from file.
   if(!readTrajectoryFile)
@@ -223,7 +248,7 @@ int main(int argc, char** argv)
 
   if(readTrajectoryFile)
   {
-    rosbag::Bag bag(bagFilePath, rosbag::bagmode::Read);
+    rosbag::Bag bag(bagReadFilePath, rosbag::bagmode::Read);
     rosbag::View view(bag, rosbag::TopicQuery("trajectory"));
 
     BOOST_FOREACH(rosbag::MessageInstance const m, view)
@@ -244,10 +269,11 @@ int main(int argc, char** argv)
   if(writeTrajectoryFile && !readTrajectoryFile)
   {
     rosbag::Bag bag1;
-    bag1.open(bagFilePath, rosbag::bagmode::Write);
+    bag1.open(bagWriteFilePath, rosbag::bagmode::Write);
     bag1.write("trajectory", ros::Time::now(), joint_solution);
+    bag1.write("planningscene", ros::Time::now(), planning_scene);
     bag1.close();
-    ROS_INFO("Trajectory written to .bag file.");
+    ROS_INFO("Trajectory and scene written to .bag file.");
   }
   
 
