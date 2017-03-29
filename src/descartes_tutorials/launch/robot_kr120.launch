@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="robot_kr120" pkg="descartes_tutorials" type="robot_kr120" output="screen" />
+
+</launch>
