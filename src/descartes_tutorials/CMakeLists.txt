@@ -26,12 +26,18 @@ include_directories(
 
  add_executable(${PROJECT_NAME}_tutorial1 src/tutorial1.cpp)
  add_executable(${PROJECT_NAME}_robot src/robot.cpp src/trajvis.cpp)
+ add_executable(${PROJECT_NAME}_robot_kr120 src/robot_kr120.cpp src/trajvis.cpp)
 
  target_link_libraries(${PROJECT_NAME}_tutorial1
    ${catkin_LIBRARIES}
  )
  
  target_link_libraries(${PROJECT_NAME}_robot
+   ${catkin_LIBRARIES}
+   utilities
+ )
+ 
+  target_link_libraries(${PROJECT_NAME}_robot_kr120
    ${catkin_LIBRARIES}
    utilities
  )
@@ -42,6 +48,10 @@ set_target_properties(${PROJECT_NAME}_tutorial1
 
 set_target_properties(${PROJECT_NAME}_robot
   PROPERTIES OUTPUT_NAME robot
+  PREFIX "")
+  
+set_target_properties(${PROJECT_NAME}_robot_kr120
+  PROPERTIES OUTPUT_NAME robot_kr120
   PREFIX "")
 
 #############
