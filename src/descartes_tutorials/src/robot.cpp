@@ -7,6 +7,7 @@
 
 // Includes the descartes robot model we will be using; <moveit/planning_scene/planning_scene.h> already included
 #include <descartes_moveit/moveit_state_adapter.h>
+#include <descartes_moveit/ikfast_moveit_state_adapter.h>
 
 //Includes for collision objects
 #include <moveit/move_group_interface/move_group.h>
@@ -189,7 +190,7 @@ int main(int argc, char** argv)
   }
 
   // 2. Create a robot model and initialize it
-  descartes_core::RobotModelPtr model (new descartes_moveit::MoveitStateAdapter);
+  descartes_core::RobotModelPtr model (new descartes_moveit::IkFastMoveitStateAdapter);
   
   //Enable collision checking
   model->setCheckCollisions(true);

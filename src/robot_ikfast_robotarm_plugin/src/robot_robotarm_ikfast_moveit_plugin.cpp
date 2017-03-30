@@ -1148,6 +1148,7 @@ bool IKFastKinematicsPlugin::getPositionIK(const std::vector<geometry_msgs::Pose
   }
 
   ROS_DEBUG_STREAM_NAMED("ikfast","Found " << numsol << " solutions from IKFast");
+  //ROS_INFO_STREAM("ikfast Found " << numsol << " solutions from IKFast");
   bool solutions_found = false;
   if( numsol > 0 )
   {
