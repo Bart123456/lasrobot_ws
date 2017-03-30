@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <launch>
 
+  <!-- Path to save scene data-->
+  <param name="local_path" value="$(find descartes_tutorials)/Scenarios/trajectories/trajectory.bag"/>
+
   <node name="robot" pkg="descartes_tutorials" type="robot" output="screen" />
 
 </launch>

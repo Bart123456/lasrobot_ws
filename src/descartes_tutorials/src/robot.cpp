@@ -53,8 +53,12 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 
 bool readTrajectoryFile = false;
 bool writeTrajectoryFile = true;
-std::string bagReadFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
-std::string bagWriteFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
+//std::string bagReadFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
+//std::string bagWriteFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
+
+//****************************
+//**     main loop          **
+//****************************
 int main(int argc, char** argv)
 {
   // Initialize ROS
@@ -68,6 +72,20 @@ int main(int argc, char** argv)
   trajectory_msgs::JointTrajectory readTrajectory;
   trajectory_msgs::JointTrajectory joint_solution;
   
+  // get local path to save scene results
+  std::string local_path;
+    
+  if (nh.getParam("/local_path", local_path))
+  {
+    std::cout << local_path << std::endl;
+  }
+  else
+  {
+    std::cout << "Path not found" << std::endl;
+  }
+
+  std::string bagReadFilePath = local_path;
+  std::string bagWriteFilePath = local_path;
   
   // 1. Define sequence of points
   TrajectoryVec points;
