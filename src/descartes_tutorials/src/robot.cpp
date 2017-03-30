@@ -224,11 +224,16 @@ int main(int argc, char** argv)
   if(!readTrajectoryFile)
   {
     // 4. Feed the trajectory to the planner
+    double planningStart = ros::Time::now().toSec();
     if (!planner.planPath(points))
     {
       ROS_ERROR("Could not solve for a valid path");
       return -2;
     }
+
+    double planningEnd = ros::Time::now().toSec();
+    double planningTime = planningEnd - planningStart;
+    ROS_INFO_STREAM("Passed planning time: " << planningTime << " seconds.");
 
     TrajectoryVec result;
     if (!planner.getPath(result))
