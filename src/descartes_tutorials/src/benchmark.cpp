@@ -21,6 +21,7 @@
 #include <math.h>
 
 //Library for utilities
+#include <descartes_core/utils.h>
 #include <descartes_tutorials/utilities.h>
 
 bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory);
@@ -59,84 +60,15 @@ int main(int argc, char **argv)
     objectrY = 0.0;
     objectrZ = 0.0;
 
-    moveit_msgs::PlanningScene planning_scene;
-    //Create collision objects
-    utilities::addEnvironment(planning_scene);
-
-
-    objectpose = descartes_core::utils::toFrame(objectX, objectY, objectZ, objectrX, objectrY, objectrZ, descartes_core::utils::EulerConventions::XYZ);
-    planning_scene.world.collision_objects.push_back(utilities::makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, objectID, objectpose));
-
-    //Planning scene colors
-    planning_scene.object_colors.push_back(utilities::makeObjectColor(objectID, 0.5, 0.5, 0.5, 0.8));
-
-    //Define publisher
-    ros::Publisher planning_scene_diff_publisher;
-    planning_scene_diff_publisher = nh.advertise<moveit_msgs::PlanningScene>("planning_scene", 1);
-
-    planning_scene.is_diff = true;
-
-    //Wait for subscribers
-    ros::Rate loop_rate(10);
-    ROS_INFO("Waiting for planning_scene subscriber.");
-    if(waitForSubscribers(planning_scene_diff_publisher, ros::Duration(2.0)))
-    {
-    planning_scene_diff_publisher.publish(planning_scene);
-    ros::spinOnce();
-    loop_rate.sleep();
-    ROS_INFO("Object added to the world.");
-    } else {
-    ROS_ERROR("No subscribers connected, collision object not added");
-    }
-
-    // // planning cartesian path
-    // std::vector<geometry_msgs::Pose> waypoints;
-
-    // geometry_msgs::Pose start_pose2;
-    // start_pose2.orientation.w = 1.0;
-    // start_pose2.position.x = 0.55;
-    // start_pose2.position.y = -0.05;
-    // start_pose2.position.z = 0.8;
-
-    // geometry_msgs::Pose target_pose3 = start_pose2;
-    // target_pose3.position.x += 0.2;
-    // target_pose3.position.z += 0.2;
-    // waypoints.push_back(target_pose3);  // up and out
-
-    // target_pose3.position.y -= 0.2;
-    // waypoints.push_back(target_pose3);  // left
-
-    // target_pose3.position.z -= 0.2;
-    // target_pose3.position.y += 0.2;
-    // target_pose3.position.x -= 0.2;
-    // waypoints.push_back(target_pose3);  // down and right (back to start)
-
-    // moveit_msgs::RobotTrajectory trajectory;
-    // double fraction = group.computeCartesianPath(waypoints,
-    //                                             0.01,  // eef_step
-    //                                             0.0,   // jump_threshold
-    //                                             trajectory);
-
-    // ROS_INFO("Visualizing plan 4 (cartesian path) (%.2f%% acheived)",
-    //     fraction * 100.0);
-    // /* Sleep to give Rviz time to visualize the plan. */
-    // sleep(10.0);
-
-    // bool test2 = executeTrajectory(trajectory.joint_trajectory);
-    // ROS_INFO("Executing to_start trajectory %s",test2?"":"FAILED");
-
     // planning to start of circle weld
-    // (no trajectory to go to weld in the right way...)
+    // I put the path heigher above the ground plane with offset because
+    // move group does not find a plan otherwise...
+    double offset = 0.5;
     geometry_msgs::Pose weld_start;
     weld_start = start_pose;
-    // float alpha = - 5.0 * M_PI / 4.0;
-    // weld_start.orientation.x = 0.0 * sin(alpha / 2.0);
-    // weld_start.orientation.x = 1.0 * sin(alpha / 2.0);
-    // weld_start.orientation.x = 0.0 * sin(alpha / 2.0);
-    // weld_start.orientation.w = 1.0 * cos(alpha / 2.0);
-    weld_start.position.x += 0.1;//0.8 - 0.054;
-    weld_start.position.y += 0.0; //0.0;
-    weld_start.position.z += -0.1; //0.112 + 0.014;
+    weld_start.position.x = objectX;
+    weld_start.position.y = objectY;
+    weld_start.position.z = objectZ + offset;
     group.setPoseTarget(weld_start);
 
     moveit::planning_interface::MoveGroup::Plan my_plan;
@@ -144,26 +76,67 @@ int main(int argc, char **argv)
 
     ROS_INFO("Visualizing plan 1 (pose goal) %s",success?"":"FAILED");
     /* Sleep to give Rviz time to visualize the plan. */
-    sleep(5.0);
+    sleep(2.0);
 
+    // execute plan with action server
     if (success) {
         trajectory_msgs::JointTrajectory to_start;
         to_start = my_plan.trajectory_.joint_trajectory;
         bool test = executeTrajectory(to_start);
         ROS_INFO("Executing to_start trajectory %s",test?"":"FAILED");
     }
-    //group.move();
-    //sleep(2.0);
 
-    
+    // create circular welding path
+    std::vector<Eigen::Affine3d> poses;
+    Eigen::Affine3d centerPose;
+    centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + offset, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
+    poses = poseGeneration::circle(centerPose, 0.054, 10, -(M_PI / 4), 2 * M_PI);
 
-    // circle path
-    // ***********
+    int npoints = poses.size();
+    Eigen::Affine3d temp_pose;
+    geometry_msgs::Pose target_pose;
+    std::vector<geometry_msgs::Pose> waypoints2;
 
-    //std::vector<Eigen::Affine3d> poses;
-    //Eigen::Affine3d centerPose;
-    //centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-    //poses = poseGeneration::circle(centerPose, 0.054, 10, -(M_PI / 4), 2 * M_PI);
+    for (int i = 0; i < npoints; ++i) {
+        // get current pose
+        temp_pose = poses[i];
+
+        // get translation data
+        target_pose.position.x = temp_pose.translation()[0];
+        target_pose.position.y = temp_pose.translation()[1];
+        target_pose.position.z = temp_pose.translation()[2];
+
+        // get orientation data
+        Eigen::Quaterniond temp_q(temp_pose.rotation());
+
+        // I would expect the w coeff in the eigen quaternion to be ad index 0
+        // but it seems that this order is right
+        target_pose.orientation.x = temp_q.coeffs().data()[0];
+        target_pose.orientation.y = temp_q.coeffs().data()[1];
+        target_pose.orientation.z = temp_q.coeffs().data()[2];
+        target_pose.orientation.w = temp_q.coeffs().data()[3];
+
+        // add to waypoints vector
+        waypoints2.push_back(target_pose);
+    }
+
+    ROS_INFO("z position of circle: %f", waypoints2[0].position.z);
+
+    // plan how to execute circular welding path
+    moveit_msgs::RobotTrajectory trajectory;
+    double fraction = group.computeCartesianPath(waypoints2,
+                                                0.01,  // eef_step
+                                                0.0,   // jump_threshold
+                                                trajectory);
+
+    ROS_INFO("Visualizing plan 4 (cartesian path) (%.2f%% acheived)",
+        fraction * 100.0);
+    /* Sleep to give Rviz time to visualize the plan. */
+    sleep(5.0);
+
+    // execute plan with action server
+    bool test2 = executeTrajectory(trajectory.joint_trajectory);
+    ROS_INFO("Executing to_start trajectory %s",test2?"":"FAILED");
 
     // back to home
     group.setNamedTarget("home_pose");
@@ -171,8 +144,9 @@ int main(int argc, char **argv)
 
     ROS_INFO("Visualizing plan 1 (pose goal) %s",success?"":"FAILED");
     /* Sleep to give Rviz time to visualize the plan. */
-    sleep(5.0);
+    sleep(2.0);
 
+    // execute plan with action server
     if (success) {
         trajectory_msgs::JointTrajectory to_home;
         to_home = my_plan.trajectory_.joint_trajectory;
@@ -214,23 +188,4 @@ bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory)
     return false;
   }
   
-}
-
-// get basic info, use pass by reference for group object
-void getInfo(const moveit::planning_interface::MoveGroup &group)
-{
-	ROS_INFO("Reference frame: %s", group.getPlanningFrame().c_str());
-	ROS_INFO("Reference frame: %s", group.getEndEffectorLink().c_str());
-}
-
-geometry_msgs::Pose createPose(float w, float x, float y, float z)
-{
-	geometry_msgs::Pose pose;
-	
-	pose.orientation.w = w;
-	pose.position.x = x;
-	pose.position.y = y;
-	pose.position.z = z;
-	
-	return pose;
 }
