@@ -69,7 +69,20 @@ int main(int argc, char **argv)
     weld_start.position.x = objectX;
     weld_start.position.y = objectY;
     weld_start.position.z = objectZ + offset;
-    group.setPoseTarget(weld_start);
+    //group.setPoseTarget(weld_start);
+
+    // try joint value target
+    // these values come from descartes simulation
+    // this way the robot can move to starting point
+    // move group fails to give a plan for this point
+    std::vector<double> init_joint_values = { 0.0849047170561,
+                                                0.32949158339,
+                                                0.572402189439,
+                                                -0.178076635994,
+                                                0.740954769414,
+                                                0.854032058582 };
+
+    group.setJointValueTarget(init_joint_values);
 
     moveit::planning_interface::MoveGroup::Plan my_plan;
     bool success = group.plan(my_plan);

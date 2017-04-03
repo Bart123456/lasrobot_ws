@@ -53,8 +53,8 @@ bool waitForSubscribers(ros::Publisher & pub, ros::Duration timeout);
 
 bool readTrajectoryFile = false;
 bool writeTrajectoryFile = true;
-std::string bagReadFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
-std::string bagWriteFilePath = "/home/bart/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
+std::string bagReadFilePath = "/home/jeroen/ros/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
+std::string bagWriteFilePath = "/home/jeroen/ros/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag";
 int main(int argc, char** argv)
 {
   // Initialize ROS
