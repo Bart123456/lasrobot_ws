@@ -147,6 +147,8 @@ bool PlanningGraph::insertGraph(const std::vector<TrajectoryPtPtr>* points)
     return false;
   }
 
+  ROS_INFO_STREAM("Calculating edge weights.");
+
   std::vector<JointEdge> edges;
   if (!calculateAllEdgeWeights(poses, edges))
   {
@@ -154,11 +156,15 @@ bool PlanningGraph::insertGraph(const std::vector<TrajectoryPtPtr>* points)
     return false;
   }
 
+  ROS_INFO_STREAM("Finished calculating edge weights.");
+
   if (!populateGraphVertices(*points, poses))
   {
     ROS_ERROR_STREAM("unable to populate graph from input points");
     return false;
   }
+
+  ROS_INFO_STREAM("Finished populating graphvertices.");
 
   // from list of joint trajectories (vertices) and edges (edges), construct the actual graph
   if (!populateGraphEdges(edges))
@@ -166,6 +172,8 @@ bool PlanningGraph::insertGraph(const std::vector<TrajectoryPtPtr>* points)
     ROS_ERROR_STREAM("unable to populate graph from calculated edges");
     return false;
   }
+
+  ROS_INFO_STREAM("Finished populating graph edges.");
 
   return true;
 }
@@ -812,6 +820,8 @@ void PlanningGraph::printGraph()
 bool PlanningGraph::calculateJointSolutions(const std::vector<TrajectoryPtPtr>& points,
                                             std::vector<std::vector<JointTrajectoryPt>>& poses)
 {
+  ROS_INFO_STREAM("Calculating joint solutions.");
+  double seconds = ros::Time::now().toSec();
   poses.resize(points.size());
   for (std::size_t i = 0; i < points.size(); ++i)
   {
@@ -819,7 +829,8 @@ bool PlanningGraph::calculateJointSolutions(const std::vector<TrajectoryPtPtr>& 
     std::vector<double> weldingCosts;
     points[i]->getJointPoses(*robot_model_, joint_poses, weldingCosts);
 
-    ROS_INFO_STREAM("Calculated point " << i + 1 << "/" << points.size() << ".");
+    ROS_INFO_STREAM("Calculated point " << i + 1 << "/" << points.size() << ". Time passed: " << ros::Time::now().toSec() - seconds << " seconds.");
+    seconds = ros::Time::now().toSec();
 
     if (joint_poses.empty())
     {
