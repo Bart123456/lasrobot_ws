@@ -225,9 +225,20 @@ public:
     timing_ = timing;
   }
 
+  double getWeldingCost() const
+  {
+    return weldingCost;
+  }
+
+  void setWeldingCost(double newCost)
+  {
+    weldingCost = newCost;
+  }
+
 protected:
   ID id_; /**<@brief ID associated with this pt. Generally refers back to a process path defined elsewhere. */
   TimingConstraint timing_; /**<@brief Information specifying acceptable timing from this point to the next. */
+  double weldingCost = 0.0;
 };
 
 } /* namespace descartes_core */

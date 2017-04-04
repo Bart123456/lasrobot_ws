@@ -134,6 +134,7 @@ bool DensePlanner::updatePath()
       {
         path_[counter] = descartes_core::TrajectoryPtPtr(new descartes_trajectory::JointTrajectoryPt(p));
         path_[counter]->setID(traj[counter]->getID());
+        path_[counter]->setWeldingCost(p.getWeldingCost());
         counter++;
       }
     }

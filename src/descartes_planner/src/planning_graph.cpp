@@ -1053,7 +1053,11 @@ PlanningGraph::EdgeWeightResult PlanningGraph::edgeWeight(const JointTrajectoryP
         vector_diff += joint_diff;
       }
       //Add extra weldingcost
-      result.second = vector_diff + end.getWeldingCost();
+      if(useWeldingCost)
+      {
+        result.second = vector_diff + end.getWeldingCost() * weldingCostFactor;
+      }
+
     }
 
     result.first = true;
