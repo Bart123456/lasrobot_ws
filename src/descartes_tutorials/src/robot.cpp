@@ -128,6 +128,7 @@ int main(int argc, char** argv)
   {
     ROS_WARN_STREAM("workObjectPath parameter not found, using default: " << workObjectMeshPath);
   }
+  workObjectMeshPath = std::string("file://") + workObjectMeshPath;
 
   std::string workObjectID = "";
   if (!nh.getParam("/workObjectID", workObjectID))
@@ -232,8 +233,8 @@ int main(int argc, char** argv)
 
   for(int i = 0; i < tempSize; ++i)
   {
-    //trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
-    trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
+    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+    //trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
   }
   
   //Get both the trajectory and the markers
