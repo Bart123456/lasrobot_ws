@@ -324,11 +324,12 @@ int main(int argc, char** argv)
       return -3;
     }
 
-    //Extract weldingcosts from result
+    //Extract weldingcosts from result (Don't forget to multiply with the welding weight!)
     weldingCosts.data.resize(result.size());
+    double costWeight = planner.getPlanningGraph().getWeldingCostFactor();
     for(int i = 0; i < result.size(); ++i)
     {
-      weldingCosts.data[i] = result[i]->getWeldingCost();
+      weldingCosts.data[i] = result[i]->getWeldingCost() * costWeight;
     }
     
 
