@@ -24,6 +24,8 @@
 #include <eigen_conversions/eigen_msg.h>
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/Pose.h>
+//For weldingcosts message
+#include <std_msgs/Float64MultiArray.h>
 //Custom library for trajectory visualization in Rviz
 #include <descartes_tutorials/trajvis.h>
 //Library for utilities
@@ -79,6 +81,8 @@ int main(int argc, char** argv)
 
   geometry_msgs::PoseArray trajPoses;
   geometry_msgs::PoseArray robotPoses;
+
+  std_msgs::Float64MultiArray weldingCosts;
   
   // get local path to save scene results
   std::string local_path;
@@ -285,6 +289,16 @@ int main(int argc, char** argv)
       return -3;
     }
 
+    //Extract weldingcosts from result
+    weldingCosts.data.resize(result.size());
+    for(int i = 0; i < result.size(); ++i)
+    {
+      weldingCosts.data[i] = result[i]->getWeldingCost();
+    }
+    
+
+    
+
     // 5. Translate the result into a type that ROS understands
     // Get Joint Names
     std::vector<std::string> names;
@@ -338,6 +352,7 @@ int main(int argc, char** argv)
     bag1.write("planningscene", ros::Time::now(), planning_scene);
     bag1.write("trajectoryPoses", ros::Time::now(), trajPoses);
     bag1.write("robotPoses", ros::Time::now(), robotPoses);
+    bag1.write("weldingCosts", ros::Time::now(), weldingCosts);
     bag1.close();
     ROS_INFO("Trajectory and scene written to .bag file.");
   }

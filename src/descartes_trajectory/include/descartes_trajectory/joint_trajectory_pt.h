@@ -181,22 +181,11 @@ public:
     return lower_;
   }
 
-  double getWeldingCost() const
-  {
-    return weldingCost;
-  }
-
-  void setWeldingCost(double newCost)
-  {
-    weldingCost = newCost;
-  }
-
 protected:
   std::vector<double> nominal_;
   std::vector<double> lower_;
   std::vector<double> upper_;
   std::vector<double> discretization_; /**<@brief How finely to discretize each joint */
-  double weldingCost = 0.0;
 
   /** @name JointTrajectoryPt transforms. Used in get*CartPose() methods and for interpolation.
    *  @{
