@@ -225,7 +225,7 @@ int main(int argc, char** argv)
   }
 
   //Define tolerance sizes
-  trajectory.setRotStepSize(M_PI/12);
+  trajectory.setRotStepSize(M_PI/180);
   double rxTolerance, ryTolerance, rzTolerance;
   rxTolerance = M_PI/4;
   ryTolerance = M_PI/4;
