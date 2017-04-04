@@ -98,6 +98,30 @@ int main(int argc, char** argv)
 
   std::string bagReadFilePath = local_path;
   std::string bagWriteFilePath = local_path;
+
+  //Get settings from launch file to read or write bag files
+  if (!nh.getParam("/readTrajectoryFile", readTrajectoryFile))
+  {
+    ROS_WARN_STREAM("Readtrajectoryfile parameter not found, using default: " << readTrajectoryFile);
+  }
+
+  if (!nh.getParam("/writeTrajectoryFile", writeTrajectoryFile))
+  {
+    ROS_WARN_STREAM("Writetrajectoryfile parameter not found, using default: " << writeTrajectoryFile);
+  }
+
+  bool useWeldingCost = true;
+
+  if (!nh.getParam("/useWeldingCost", useWeldingCost))
+  {
+    ROS_WARN_STREAM("useWeldingCost parameter not found, using default: " << useWeldingCost);
+  }
+
+  double weldingCostWeight = 1.0;
+  if (!nh.getParam("/weldingCostWeight", weldingCostWeight))
+  {
+    ROS_WARN_STREAM("weldingCostWeight parameter not found, using default: " << weldingCostWeight);
+  }
   
   // 1. Define sequence of points
   TrajectoryVec points;
@@ -263,9 +287,9 @@ int main(int argc, char** argv)
   planner.initialize(model);
 
   //Use the extra weldingscost or not
-  planner.getPlanningGraph().setUseWeldingCost(true);
+  planner.getPlanningGraph().setUseWeldingCost(useWeldingCost);
   //Set the weldingcost weight:
-  planner.getPlanningGraph().setWeldingCostFactor(1.0);
+  planner.getPlanningGraph().setWeldingCostFactor(weldingCostWeight);
 
   //Don't plan path if it is read from file.
   if(!readTrajectoryFile)
