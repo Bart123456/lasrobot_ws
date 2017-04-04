@@ -260,6 +260,8 @@ int main(int argc, char** argv)
 
   //Use the extra weldingscost or not
   planner.getPlanningGraph().setUseWeldingCost(true);
+  //Set the weldingcost weight:
+  planner.getPlanningGraph().setWeldingCostFactor(1.0);
 
   //Don't plan path if it is read from file.
   if(!readTrajectoryFile)

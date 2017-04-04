@@ -155,6 +155,16 @@ public:
     useWeldingCost = tempBool;
   }
 
+  double getWeldingCostFactor()
+  {
+    return weldingCostFactor;
+  }
+
+  double setWeldingCostFactor(double newFactor)
+  {
+    weldingCostFactor = newFactor;
+  }
+
 protected:
   descartes_core::RobotModelConstPtr robot_model_;
 
@@ -163,6 +173,8 @@ protected:
   JointGraph dg_;
 
   bool useWeldingCost = true;
+
+  double weldingCostFactor = 1.0;
 
   int recalculateJointSolutionsVertexMap(
       std::map<descartes_core::TrajectoryPt::ID, JointGraph::vertex_descriptor> &joint_vertex_map) const;
