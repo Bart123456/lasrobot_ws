@@ -20,6 +20,10 @@
 //Include visualization markers for RViz
 //#include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
+//Convert affine3d poses to pose messages
+#include <eigen_conversions/eigen_msg.h>
+#include <geometry_msgs/PoseArray.h>
+#include <geometry_msgs/Pose.h>
 //Custom library for trajectory visualization in Rviz
 #include <descartes_tutorials/trajvis.h>
 //Library for utilities
@@ -72,17 +76,20 @@ int main(int argc, char** argv)
 
   trajectory_msgs::JointTrajectory readTrajectory;
   trajectory_msgs::JointTrajectory joint_solution;
+
+  geometry_msgs::PoseArray trajPoses;
+  geometry_msgs::PoseArray robotPoses;
   
   // get local path to save scene results
   std::string local_path;
     
   if (nh.getParam("/local_path", local_path))
   {
-    std::cout << local_path << std::endl;
+    ROS_INFO_STREAM("Local path found: " << local_path);
   }
   else
   {
-    std::cout << "Path not found" << std::endl;
+    ROS_ERROR_STREAM("Path not found");
   }
 
   std::string bagReadFilePath = local_path;
@@ -157,7 +164,7 @@ int main(int argc, char** argv)
     ROS_ERROR("No subscribers connected, collision object not added");
   }
 
-
+  //Define Poses
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
@@ -166,6 +173,19 @@ int main(int argc, char** argv)
   int tempSize;
   tempSize = poses.size();
 
+  //Copy poses into poseArray message
+  trajPoses.poses.resize(tempSize);
+  trajPoses.header.stamp = ros::Time::now();
+  trajPoses.header.frame_id = "Ideal trajectory poses";
+  geometry_msgs::Pose tempPose;
+
+  for(int j = 0; j < tempSize; ++j)
+  {
+    tf::poseEigenToMsg(poses[j], tempPose);
+    trajPoses.poses[j] = tempPose;
+  }
+
+  //Define tolerance sizes
   trajectory.setRotStepSize(M_PI/12);
   double rxTolerance, ryTolerance, rzTolerance;
   rxTolerance = M_PI/4;
@@ -238,6 +258,9 @@ int main(int argc, char** argv)
   descartes_planner::DensePlanner planner;
   planner.initialize(model);
 
+  //Use the extra weldingscost or not
+  planner.getPlanningGraph().setUseWeldingCost(true);
+
   //Don't plan path if it is read from file.
   if(!readTrajectoryFile)
   {
@@ -268,6 +291,21 @@ int main(int argc, char** argv)
     // Generate a ROS joint trajectory with the result path, robot model, given joint names,
     // a certain time delta between each trajectory point
     joint_solution = toROSJointTrajectory(result, *model, names, 1.0);
+
+    //Translate joint solutions to poses using FK and save them in robotPoses
+    Eigen::Affine3d eigenPose;
+    geometry_msgs::Pose tempPose;
+    robotPoses.poses.resize(joint_solution.points.size());
+    robotPoses.header.stamp = ros::Time::now();
+    robotPoses.header.frame_id = "Trajectory poses reached by robot";
+
+    for(int k = 0; k < joint_solution.points.size(); ++k)
+    {
+      model->getFK(joint_solution.points[k].positions, eigenPose);
+      tf::poseEigenToMsg(eigenPose, tempPose);
+      robotPoses.poses[k] = tempPose;
+    }
+
   } //END OF IF
 
   if(readTrajectoryFile)
@@ -296,6 +334,8 @@ int main(int argc, char** argv)
     bag1.open(bagWriteFilePath, rosbag::bagmode::Write);
     bag1.write("trajectory", ros::Time::now(), joint_solution);
     bag1.write("planningscene", ros::Time::now(), planning_scene);
+    bag1.write("trajectoryPoses", ros::Time::now(), trajPoses);
+    bag1.write("robotPoses", ros::Time::now(), robotPoses);
     bag1.close();
     ROS_INFO("Trajectory and scene written to .bag file.");
   }
