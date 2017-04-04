@@ -98,6 +98,42 @@ int main(int argc, char** argv)
 
   std::string bagReadFilePath = local_path;
   std::string bagWriteFilePath = local_path;
+
+  //Get settings from launch file
+  if (!nh.getParam("/readTrajectoryFile", readTrajectoryFile))
+  {
+    ROS_WARN_STREAM("Readtrajectoryfile parameter not found, using default: " << readTrajectoryFile);
+  }
+
+  if (!nh.getParam("/writeTrajectoryFile", writeTrajectoryFile))
+  {
+    ROS_WARN_STREAM("Writetrajectoryfile parameter not found, using default: " << writeTrajectoryFile);
+  }
+
+  bool useWeldingCost = true;
+
+  if (!nh.getParam("/useWeldingCost", useWeldingCost))
+  {
+    ROS_WARN_STREAM("useWeldingCost parameter not found, using default: " << useWeldingCost);
+  }
+
+  double weldingCostWeight = 1.0;
+  if (!nh.getParam("/weldingCostWeight", weldingCostWeight))
+  {
+    ROS_WARN_STREAM("weldingCostWeight parameter not found, using default: " << weldingCostWeight);
+  }
+
+  std::string workObjectMeshPath = "";
+  if (!nh.getParam("/workObjectPath", workObjectMeshPath))
+  {
+    ROS_WARN_STREAM("workObjectPath parameter not found, using default: " << workObjectMeshPath);
+  }
+
+  std::string workObjectID = "";
+  if (!nh.getParam("/workObjectID", workObjectID))
+  {
+    ROS_WARN_STREAM("workObjectID parameter not found, using default: " << workObjectID);
+  }
   
   // 1. Define sequence of points
   TrajectoryVec points;
@@ -111,8 +147,6 @@ int main(int argc, char** argv)
   Eigen::Affine3d objectpose;
   
   double objectX, objectY, objectZ, objectrX, objectrY, objectrZ;
-  std::string objectID;
-  objectID = "tube_on_plate";
   objectX = 0.8;
   objectY = 0.0;
   objectZ = 0.112;
@@ -128,10 +162,10 @@ int main(int argc, char** argv)
 
 
     objectpose = descartes_core::utils::toFrame(objectX, objectY, objectZ, objectrX, objectrY, objectrZ, descartes_core::utils::EulerConventions::XYZ);
-    planning_scene.world.collision_objects.push_back(utilities::makeCollisionObject("package://descartes_tutorials/Scenarios/Meshes/tube_on_plate.stl", objectscale, objectID, objectpose));
+    planning_scene.world.collision_objects.push_back(utilities::makeCollisionObject(workObjectMeshPath, objectscale, workObjectID, objectpose));
     
     //Planning scene colors
-    planning_scene.object_colors.push_back(utilities::makeObjectColor(objectID, 0.5, 0.5, 0.5, 0.8));
+    planning_scene.object_colors.push_back(utilities::makeObjectColor(workObjectID, 0.5, 0.5, 0.5, 0.8));
   } else {
     rosbag::Bag bag2(bagReadFilePath, rosbag::bagmode::Read);
     rosbag::View view(bag2, rosbag::TopicQuery("planningscene"));
@@ -263,9 +297,9 @@ int main(int argc, char** argv)
   planner.initialize(model);
 
   //Use the extra weldingscost or not
-  planner.getPlanningGraph().setUseWeldingCost(true);
+  planner.getPlanningGraph().setUseWeldingCost(useWeldingCost);
   //Set the weldingcost weight:
-  planner.getPlanningGraph().setWeldingCostFactor(1.0);
+  planner.getPlanningGraph().setWeldingCostFactor(weldingCostWeight);
 
   //Don't plan path if it is read from file.
   if(!readTrajectoryFile)
