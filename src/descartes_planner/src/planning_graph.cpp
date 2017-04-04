@@ -813,12 +813,13 @@ bool PlanningGraph::calculateJointSolutions(const std::vector<TrajectoryPtPtr>& 
                                             std::vector<std::vector<JointTrajectoryPt>>& poses)
 {
   poses.resize(points.size());
-
   for (std::size_t i = 0; i < points.size(); ++i)
   {
     std::vector<std::vector<double>> joint_poses;
     std::vector<double> weldingCosts;
     points[i]->getJointPoses(*robot_model_, joint_poses, weldingCosts);
+
+    ROS_INFO_STREAM("Calculated point " << i + 1 << "/" << points.size() << ".");
 
     if (joint_poses.empty())
     {
