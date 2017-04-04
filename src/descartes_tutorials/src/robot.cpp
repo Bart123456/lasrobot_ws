@@ -7,6 +7,7 @@
 
 // Includes the descartes robot model we will be using; <moveit/planning_scene/planning_scene.h> already included
 #include <descartes_moveit/moveit_state_adapter.h>
+#include <descartes_moveit/ikfast_moveit_state_adapter.h>
 
 //Includes for collision objects
 #include <moveit/move_group_interface/move_group.h>
@@ -160,7 +161,7 @@ int main(int argc, char** argv)
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.054, 10, -(M_PI / 4), 2 * M_PI);
+  poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
 
   int tempSize;
   tempSize = poses.size();
@@ -173,8 +174,8 @@ int main(int argc, char** argv)
 
   for(int i = 0; i < tempSize; ++i)
   {
-    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
-    //trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
+    //trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+    trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
   }
   
   //Get both the trajectory and the markers
@@ -207,7 +208,7 @@ int main(int argc, char** argv)
   }
 
   // 2. Create a robot model and initialize it
-  descartes_core::RobotModelPtr model (new descartes_moveit::MoveitStateAdapter);
+  descartes_core::RobotModelPtr model (new descartes_moveit::IkFastMoveitStateAdapter);
   
   //Enable collision checking
   model->setCheckCollisions(true);
@@ -241,11 +242,16 @@ int main(int argc, char** argv)
   if(!readTrajectoryFile)
   {
     // 4. Feed the trajectory to the planner
+    double planningStart = ros::Time::now().toSec();
     if (!planner.planPath(points))
     {
       ROS_ERROR("Could not solve for a valid path");
       return -2;
     }
+
+    double planningEnd = ros::Time::now().toSec();
+    double planningTime = planningEnd - planningStart;
+    ROS_INFO_STREAM("Passed planning time: " << planningTime << " seconds.");
 
     TrajectoryVec result;
     if (!planner.getPath(result))

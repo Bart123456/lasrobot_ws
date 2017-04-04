@@ -1,0 +1,1 @@
+rosrun moveit_ikfast create_ikfast_moveit_plugin.py robot robotarm robot_ikfast_robotarm_plugin /home/bart/lasrobot_ws/src/robot_ikfast_robotarm_plugin/src/robot_robotarm_ikfast_solver.cpp
