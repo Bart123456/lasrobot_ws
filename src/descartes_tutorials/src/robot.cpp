@@ -117,6 +117,12 @@ int main(int argc, char** argv)
     ROS_WARN_STREAM("useWeldingCost parameter not found, using default: " << useWeldingCost);
   }
 
+  bool collisionChecking = true;
+  if (!nh.getParam("/collisionChecking", collisionChecking))
+  {
+    ROS_WARN_STREAM("collisionChecking parameter not found, using default: " << collisionChecking);
+  }
+
   double weldingCostWeight = 1.0;
   if (!nh.getParam("/weldingCostWeight", weldingCostWeight))
   {
@@ -286,7 +292,7 @@ int main(int argc, char** argv)
   descartes_core::RobotModelPtr model (new descartes_moveit::IkFastMoveitStateAdapter);
   
   //Enable collision checking
-  model->setCheckCollisions(true);
+  model->setCheckCollisions(collisionChecking);
 
   // Name of description on parameter server. Typically just "robot_description".
   const std::string robot_description = "robot_description";
