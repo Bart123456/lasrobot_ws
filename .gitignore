@@ -6,6 +6,8 @@ src/lasrobot_moveit_generated/default_mongo_db/*
 src/robot_moveit_config/default_mongo_db/*
 src/robot_moveit_config/default_warehouse_mongo_db/*
 src/kr120_with_torch_moveit_config/default_warehouse_mongo_db/*
+src/robot_fixjoint_moveit_config/default_mongo_db/*
+src/robot_fixjoint_moveit_config/default_warehouse_mongo_db/*
 # temp files
 *~
 # eclipse

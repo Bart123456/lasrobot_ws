@@ -207,7 +207,7 @@ int main(int argc, char** argv)
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
+  poses = poseGeneration::circle(centerPose, 0.054, 15, -(M_PI / 4), 2 * M_PI);
 
   int tempSize;
   tempSize = poses.size();
@@ -227,9 +227,9 @@ int main(int argc, char** argv)
   //Define tolerance sizes
   trajectory.setRotStepSize(M_PI/180);
   double rxTolerance, ryTolerance, rzTolerance;
-  rxTolerance = M_PI/36;
-  ryTolerance = M_PI/36;
-  rzTolerance = 2*M_PI;
+  rxTolerance = 0; //M_PI/36;
+  ryTolerance = 0; //M_PI/36;
+  rzTolerance = 0; //2*M_PI;
 
   for(int i = 0; i < tempSize; ++i)
   {
