@@ -47,7 +47,7 @@ typedef TrajectoryVec::const_iterator TrajectoryIter;
  */
 trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory, const descartes_core::RobotModel& model,
-                     const std::vector<std::string>& joint_names, double trajLength);
+                     const std::vector<std::string>& joint_names, double trajLength, double speed);
 
 /**
  * Sends a ROS trajectory to the robot controller
@@ -121,6 +121,12 @@ int main(int argc, char** argv)
   if (!nh.getParam("/weldingCostWeight", weldingCostWeight))
   {
     ROS_WARN_STREAM("weldingCostWeight parameter not found, using default: " << weldingCostWeight);
+  }
+
+  double weldingSpeed = 0.005;
+  if (!nh.getParam("/weldingSpeed", weldingSpeed))
+  {
+    ROS_WARN_STREAM("weldingSpeed parameter not found, using default: " << weldingSpeed);
   }
 
   std::string workObjectMeshPath = "";
@@ -352,7 +358,7 @@ int main(int argc, char** argv)
     nh.getParam("controller_joint_names", names);
     // Generate a ROS joint trajectory with the result path, robot model, given joint names,
     // a certain time delta between each trajectory point
-    joint_solution = toROSJointTrajectory(result, *model, names, trajectoryDistance);
+    joint_solution = toROSJointTrajectory(result, *model, names, trajectoryDistance, weldingSpeed);
 
     //Translate joint solutions to poses using FK and save them in robotPoses
     Eigen::Affine3d eigenPose;
@@ -423,7 +429,7 @@ trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory,
                      const descartes_core::RobotModel& model,
                      const std::vector<std::string>& joint_names,
-                     double trajLength)
+                     double trajLength, double speed)
 {
   // Fill out information about our trajectory
   trajectory_msgs::JointTrajectory result;
@@ -432,7 +438,6 @@ toROSJointTrajectory(const TrajectoryVec& trajectory,
   result.joint_names = joint_names;
 
   //Trajectory timing
-  double speed = 0.005;  //Desired torch speed in m/s
   double trajTime = trajLength / speed;
   double time_delay = trajTime / trajectory.size();
 
