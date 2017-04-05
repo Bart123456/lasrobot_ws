@@ -211,10 +211,10 @@ int main(int argc, char** argv)
 
   Eigen::Affine3d startPose;
   Eigen::Affine3d endPose;
-  startPose = descartes_core::utils::toFrame(objectX, objectY - 0.105, objectZ + 0.105, -(M_PI / 2) - M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
-  endPose = descartes_core::utils::toFrame(objectX + 0.315, objectY - 0.105, objectZ + 0.105, -(M_PI / 2) - M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
+  startPose = descartes_core::utils::toFrame(objectX, objectY + 0.025, objectZ + 0.025, (M_PI / 2) + M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
+  endPose = descartes_core::utils::toFrame(objectX + 0.4, objectY + 0.025, objectZ + 0.025, (M_PI / 2) + M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
 
-  poses = poseGeneration::straightLine(startPose, endPose, 10);
+  poses = poseGeneration::straightLine(startPose, endPose, 50);
 
 
   int tempSize;
@@ -235,9 +235,9 @@ int main(int argc, char** argv)
   //Define tolerance sizes
   trajectory.setRotStepSize(M_PI/180);
   double rxTolerance, ryTolerance, rzTolerance;
-  rxTolerance = 0; //M_PI/36;
-  ryTolerance = 0; //M_PI/36;
-  rzTolerance = 2 * M_PI;
+  rxTolerance = M_PI / 4; //M_PI/36;
+  ryTolerance = 0;
+  rzTolerance = 0;
 
   for(int i = 0; i < tempSize; ++i)
   {
