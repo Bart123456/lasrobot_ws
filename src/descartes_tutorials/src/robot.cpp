@@ -166,7 +166,7 @@ int main(int argc, char** argv)
     planning_scene.world.collision_objects.push_back(utilities::makeCollisionObject(workObjectMeshPath, objectscale, workObjectID, objectpose));
     
     //Planning scene colors
-    planning_scene.object_colors.push_back(utilities::makeObjectColor(workObjectID, 0.5, 0.5, 0.5, 0.8));
+    planning_scene.object_colors.push_back(utilities::makeObjectColor(workObjectID, 0.5, 0.5, 0.5, 1.0));
   } else {
     rosbag::Bag bag2(bagReadFilePath, rosbag::bagmode::Read);
     rosbag::View view(bag2, rosbag::TopicQuery("planningscene"));
@@ -205,9 +205,17 @@ int main(int argc, char** argv)
 
   //Define Poses
   std::vector<Eigen::Affine3d> poses;
-  Eigen::Affine3d centerPose;
-  centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.054, 15, -(M_PI / 4), 2 * M_PI);
+  //Eigen::Affine3d centerPose;
+  //centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
+  //poses = poseGeneration::circle(centerPose, 0.054, 15, -(M_PI / 4), 2 * M_PI);
+
+  Eigen::Affine3d startPose;
+  Eigen::Affine3d endPose;
+  startPose = descartes_core::utils::toFrame(objectX, objectY - 0.105, objectZ + 0.105, -(M_PI / 2) - M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
+  endPose = descartes_core::utils::toFrame(objectX + 0.315, objectY - 0.105, objectZ + 0.105, -(M_PI / 2) - M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
+
+  poses = poseGeneration::straightLine(startPose, endPose, 10);
+
 
   int tempSize;
   tempSize = poses.size();
@@ -227,14 +235,14 @@ int main(int argc, char** argv)
   //Define tolerance sizes
   trajectory.setRotStepSize(M_PI/180);
   double rxTolerance, ryTolerance, rzTolerance;
-  rxTolerance = 0; //M_PI/36;
+  rxTolerance = M_PI/36;
   ryTolerance = 0; //M_PI/36;
-  rzTolerance = 0; //2*M_PI;
+  rzTolerance = 2 * M_PI;
 
   for(int i = 0; i < tempSize; ++i)
   {
-    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
-    //trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
+    //trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+    trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
   }
   
   //Get both the trajectory and the markers
