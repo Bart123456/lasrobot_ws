@@ -30,7 +30,7 @@
 #include <descartes_tutorials/trajvis.h>
 //Library for utilities
 #include <descartes_tutorials/utilities.h>
-
+//Math
 #include <math.h>
 
 //For saving msgs to file.
@@ -83,6 +83,8 @@ int main(int argc, char** argv)
   geometry_msgs::PoseArray robotPoses;
 
   std_msgs::Float64MultiArray weldingCosts;
+  std_msgs::Float64MultiArray angleErrorsX;
+  std_msgs::Float64MultiArray angleErrorsY;
   
   // get local path to save scene results
   std::string local_path;
@@ -373,11 +375,24 @@ int main(int argc, char** argv)
     robotPoses.header.stamp = ros::Time::now();
     robotPoses.header.frame_id = "Trajectory poses reached by robot";
 
+    //Also calculate resulting angle errors and save them
+    std::vector<double> xAnglesErrors;
+    std::vector<double> yAnglesErrors;
     for(int k = 0; k < joint_solution.points.size(); ++k)
     {
       model->getFK(joint_solution.points[k].positions, eigenPose);
+      utilities::computeAngleErrors(poses[k], eigenPose, xAnglesErrors, yAnglesErrors);
       tf::poseEigenToMsg(eigenPose, tempPose);
       robotPoses.poses[k] = tempPose;
+    }
+
+    //Put angle errors in messages
+    angleErrorsX.data.resize(xAnglesErrors.size());
+    angleErrorsY.data.resize(yAnglesErrors.size());
+    for(int i = 0; i < xAnglesErrors.size(); ++i)
+    {
+      angleErrorsX.data[i] = xAnglesErrors[i];
+      angleErrorsY.data[i] = yAnglesErrors[i];
     }
 
   } //END OF IF
@@ -411,6 +426,8 @@ int main(int argc, char** argv)
     bag1.write("trajectoryPoses", ros::Time::now(), trajPoses);
     bag1.write("robotPoses", ros::Time::now(), robotPoses);
     bag1.write("weldingCosts", ros::Time::now(), weldingCosts);
+    bag1.write("angleErrorsX", ros::Time::now(), angleErrorsX);
+    bag1.write("angleErrorsY", ros::Time::now(), angleErrorsY);
     bag1.close();
     ROS_INFO("Trajectory and scene written to .bag file.");
   }
