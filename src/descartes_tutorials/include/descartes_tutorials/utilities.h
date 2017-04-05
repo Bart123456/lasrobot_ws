@@ -22,6 +22,8 @@ namespace utilities {
 	moveit_msgs::ObjectColor makeObjectColor(std::string id, std_msgs::ColorRGBA color);
 
 	moveit_msgs::ObjectColor makeObjectColor(std::string id, double r, double g, double b, double a);
+
+	void computeAngleErrors(Eigen::Affine3d referencePose, Eigen::Affine3d pose, std::vector<double>& xErrors, std::vector<double>& yErrors);
 }
 
 namespace poseGeneration {

@@ -93,6 +93,56 @@ namespace utilities {
 		return oc;
 	}
 
+	void computeAngleErrors(Eigen::Affine3d referencePose, Eigen::Affine3d pose, std::vector<double>& xErrors, std::vector<double>& yErrors) 
+	{
+		/*
+		Poses are supposed to only differ in rotation matrix, the translations should be the same,
+		unless a certain position tolerance is used.
+		The reference pose is supposed to be the optimal solution.
+		Because of the convention used, there are two welding angles:
+			1) rotation around the local Y-axis, the most critical rotation in terms of weld quality
+			2) rotation around the local X-axis
+
+		The problem now is to find those angles given a reference pose and a new, rotated 'pose'.
+		Method: we calculate the Z-axis of the rotated 'pose'.
+		Then this Z-axis is projected onto the X-Z-plane of the reference pose. Call this vector 'projectionZ'.
+		This projectionZ can then be used to calculate the Y- and X-rotation-angles, using vector dot products:
+			1) the dot product between 'projectionZ' and the Z-axis of the referencepose defines the Y-rotation-angle
+			2) the dot product between 'projectionZ' and the Z-axis of the rotated 'pose' defines the X-rotation-angle.
+		*/
+		
+		//Since translations are supposed to be the same, the result is supposed to be a rotation only transform
+		
+		Eigen::Vector3d zeroVec(0.0,0.0,0.0);
+		pose.translation() = zeroVec;
+		referencePose.translation() = zeroVec;
+
+		//We transform the 'pose' with the inverse of the referencePose transform:
+		Eigen::Affine3d revertedPose;
+		revertedPose = referencePose.inverse() * pose;
+		//This 'revertedPose' transform now represents a rotation of the origin frame.
+		//The reference frame is now the origin frame:
+		//referencePose = referencePose.inverse() * referencePose; //Should be identity; this step is actually useless
+
+		//Calculate Z-axis of pose- and referenceframe:
+		Eigen::Vector3d axisZ(0.0,0.0,1.0);
+		Eigen::Vector3d poseZ;
+		poseZ = revertedPose * axisZ;
+
+		//To calculate the projection of poseZ in the X-Z-plane of the reference frame we set its Y-component to zero:
+		//We can do this because the referencePose transform is now an identity transform.
+		Eigen::Vector3d projectionZ(poseZ[0], 0.0, poseZ[2]);
+
+
+		//Now calculate the rotation angles using dot products:
+		double xRotation, yRotation;
+		yRotation = acos(axisZ.dot(projectionZ) / projectionZ.norm());
+		xRotation = acos(poseZ.dot(projectionZ) / (poseZ.norm() * projectionZ.norm()));
+
+		xErrors.push_back(xRotation);
+		yErrors.push_back(yRotation);
+	}
+
 } //Namespace utilities
 
 namespace poseGeneration {
