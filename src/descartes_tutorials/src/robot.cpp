@@ -47,7 +47,7 @@ typedef TrajectoryVec::const_iterator TrajectoryIter;
  */
 trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory, const descartes_core::RobotModel& model,
-                     const std::vector<std::string>& joint_names, double time_delay);
+                     const std::vector<std::string>& joint_names, double trajLength);
 
 /**
  * Sends a ROS trajectory to the robot controller
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.054, 15, -(M_PI / 4), 2 * M_PI);
+  poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
 
   int tempSize;
   tempSize = poses.size();
@@ -229,13 +229,23 @@ int main(int argc, char** argv)
   double rxTolerance, ryTolerance, rzTolerance;
   rxTolerance = 0; //M_PI/36;
   ryTolerance = 0; //M_PI/36;
-  rzTolerance = 0; //2*M_PI;
+  rzTolerance = 2*M_PI;
 
   for(int i = 0; i < tempSize; ++i)
   {
     trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
     //trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
   }
+
+  double trajectoryDistance = 0.0;
+  Eigen::Vector3d tempVec;
+  for(int i = 0; i < tempSize - 1; ++i)
+  {
+    tempVec = poses[i + 1].translation() - poses[i].translation();
+    trajectoryDistance += tempVec.norm();
+  }
+
+  ROS_INFO_STREAM("Total trajectory distance: " << trajectoryDistance);
   
   //Get both the trajectory and the markers
   markerVec = trajectory.getMarkers();
@@ -342,7 +352,7 @@ int main(int argc, char** argv)
     nh.getParam("controller_joint_names", names);
     // Generate a ROS joint trajectory with the result path, robot model, given joint names,
     // a certain time delta between each trajectory point
-    joint_solution = toROSJointTrajectory(result, *model, names, 1.0);
+    joint_solution = toROSJointTrajectory(result, *model, names, trajectoryDistance);
 
     //Translate joint solutions to poses using FK and save them in robotPoses
     Eigen::Affine3d eigenPose;
@@ -413,13 +423,18 @@ trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory,
                      const descartes_core::RobotModel& model,
                      const std::vector<std::string>& joint_names,
-                     double time_delay)
+                     double trajLength)
 {
   // Fill out information about our trajectory
   trajectory_msgs::JointTrajectory result;
   result.header.stamp = ros::Time::now();
   result.header.frame_id = "world_frame";
   result.joint_names = joint_names;
+
+  //Trajectory timing
+  double speed = 0.005;  //Desired torch speed in m/s
+  double trajTime = trajLength / speed;
+  double time_delay = trajTime / trajectory.size();
 
   // For keeping track of time-so-far in the trajectory
   double time_offset = 0.0;
