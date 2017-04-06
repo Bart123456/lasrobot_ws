@@ -9,7 +9,7 @@
   <param name="useWeldingCost" value="true"/>
   <param name="weldingCostWeight" value="10.0"/>
   <param name="weldingSpeed" value="0.01"/> <!-- Speed in m/s-->
-  <param name="workObjectPath" value="$(find descartes_tutorials)/Scenarios/Meshes/WorkObject_test.stl"/>
+  <param name="workObjectPath" value="$(find descartes_tutorials)/Scenarios/Meshes/WorkObject_test3.stl"/>
   <param name="workObjectID" value="workObject_CollisionObject"/>
 
   <node name="robot" pkg="descartes_tutorials" type="robot" output="screen" />
