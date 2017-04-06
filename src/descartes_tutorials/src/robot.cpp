@@ -298,7 +298,7 @@ int main(int argc, char** argv)
   }
 
   // 2. Create a robot model and initialize it
-  descartes_core::RobotModelPtr model (new descartes_moveit::MoveitStateAdapter); //IkFastMoveitStateAdapter
+  descartes_core::RobotModelPtr model (new descartes_moveit::IkFastMoveitStateAdapter); //IkFastMoveitStateAdapter
   
   //Enable collision checking
   model->setCheckCollisions(collisionChecking);
