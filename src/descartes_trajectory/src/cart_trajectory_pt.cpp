@@ -258,30 +258,42 @@ double CartTrajectoryPt::computeWeldingCost(Eigen::Affine3d referencePose, Eigen
   double costFactorY = 10.0;
   double cost;
   
-  //Since translations are supposed to be the same, the result is supposed to be a rotation only transform
+  // //Since translations are supposed to be the same, the result is supposed to be a rotation only transform
   
-  Eigen::Vector3d zeroVec(0.0,0.0,0.0);
-  pose.translation() = zeroVec;
-  referencePose.translation() = zeroVec;
+  // Eigen::Vector3d zeroVec(0.0,0.0,0.0);
+  // pose.translation() = zeroVec;
+  // referencePose.translation() = zeroVec;
 
-  //We transform the 'pose' with the inverse of the referencePose transform:
-  Eigen::Affine3d revertedPose;
-  revertedPose = referencePose.inverse() * pose;
-  //This 'revertedPose' transform now represents a rotation of the origin frame.
-  //The reference frame is now the origin frame:
-  //referencePose = referencePose.inverse() * referencePose; //Should be identity; this step is actually useless
+  // //We transform the 'pose' with the inverse of the referencePose transform:
+  // Eigen::Affine3d revertedPose;
+  // revertedPose = referencePose.inverse() * pose;
+  // //This 'revertedPose' transform now represents a rotation of the origin frame.
+  // //The reference frame is now the origin frame:
+  // //referencePose = referencePose.inverse() * referencePose; //Should be identity; this step is actually useless
 
-  // now convert this reference pose to xyz euler angles
-  Eigen::Matrix3d m = revertedPose.rotation();
-  Eigen::Vector3d rxyz = m.eulerAngles(0, 1, 2);
+  // // now convert this reference pose to xyz euler angles
+  // Eigen::Matrix3d m = revertedPose.rotation();
+  // Eigen::Vector3d rxyz = m.eulerAngles(0, 1, 2);
 
 
-  //Now calculate the rotation angles using dot products:
-  double xRotation, yRotation;
-  xRotation = rxyz(0);
-  yRotation = rxyz(1);
+  // //Now calculate the rotation angles using dot products:
+  // double xRotation, yRotation;
+  // xRotation = rxyz(0);
+  // yRotation = rxyz(1);
 
-  cost = costFactorX * std::abs(xRotation) + costFactorY * std::abs(yRotation);
+  // cost = costFactorX * std::abs(xRotation) + costFactorY * std::abs(yRotation);
+
+  // toleranced frame is given in base frame so calculate difference in euler angles between the frames
+  Eigen::Matrix3d Ree = pose.rotation(); // orientation of welding torch
+  Eigen::Matrix3d Rp = referencePose.rotation(); // orientation of path trajectory point
+
+  // calculate xyz euler angles of the two orientations
+  Eigen::Vector3d Eee = Ree.eulerAngles(0, 1, 2);
+  Eigen::Vector3d Ep = Rp.eulerAngles(0, 1, 2);
+
+  // cost is difference in euler angles of x and y rotation (z not relevant for welding)
+  cost = costFactorX * std::abs(Eee(0) - Ep(0)) + costFactorY * std::abs(Eee(1) - Ep(1));
+
   return cost;
 }
 
