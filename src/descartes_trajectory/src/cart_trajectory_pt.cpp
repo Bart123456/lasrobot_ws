@@ -237,6 +237,9 @@ bool CartTrajectoryPt::computeCartesianPoses(EigenSTL::vector_Affine3d &poses) c
 double CartTrajectoryPt::computeWeldingCost(Eigen::Affine3d referencePose, Eigen::Affine3d pose) const
 {
   /*
+  Edit Jeroen
+  Since the tolerances are added as xyz euler angles, whe should use these angels to calculate the error.
+
   Poses are supposed to only differ in rotation matrix, the translations should be the same,
   unless a certain position tolerance is used.
   The reference pose is supposed to be the optimal solution, any extra rotations will result in cost increase.
@@ -268,20 +271,15 @@ double CartTrajectoryPt::computeWeldingCost(Eigen::Affine3d referencePose, Eigen
   //The reference frame is now the origin frame:
   //referencePose = referencePose.inverse() * referencePose; //Should be identity; this step is actually useless
 
-  //Calculate Z-axis of pose- and referenceframe:
-  Eigen::Vector3d axisZ(0.0,0.0,1.0);
-  Eigen::Vector3d poseZ;
-  poseZ = revertedPose * axisZ;
-
-  //To calculate the projection of poseZ in the X-Z-plane of the reference frame we set its Y-component to zero:
-  //We can do this because the referencePose transform is now an identity transform.
-  Eigen::Vector3d projectionZ(poseZ[0], 0.0, poseZ[2]);
+  // now convert this reference pose to xyz euler angles
+  Eigen::Matrix3d m = revertedPose.rotation();
+  Eigen::Vector3d rxyz = m.eulerAngles(0, 1, 2);
 
 
   //Now calculate the rotation angles using dot products:
   double xRotation, yRotation;
-  yRotation = acos(axisZ.dot(projectionZ) / projectionZ.norm());
-  xRotation = acos(poseZ.dot(projectionZ) / (poseZ.norm() * projectionZ.norm()));
+  xRotation = rxyz(0);
+  yRotation = rxyz(1);
 
   cost = costFactorX * std::abs(xRotation) + costFactorY * std::abs(yRotation);
   return cost;
