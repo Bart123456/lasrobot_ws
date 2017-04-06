@@ -47,8 +47,10 @@ for error in errorsYnocost:
 	count += 1
 	
 import matplotlib.pyplot as plt
-plt.plot(time, errorsY, 'b', time, errorsYnocost, 'g')
-plt.ylabel('Angle errors in radian')
-plt.xlabel('Time in seconds')
-plt.legend(['Y Angle Error with weldingcost [rad]', 'Y Angle Error no cost [rad]'])
-plt.show()
+plt.plot(time, errorsY, 'k', time, errorsYnocost, 'k--', linewidth=2.0)
+plt.ylabel('Euler Angle Difference [rad]')
+plt.xlabel('Time [s]')
+plt.axis([0, 40, -0.5, 1])
+plt.legend(['Improved cost function', 'Standard cost function'])
+#~ plt.show()
+plt.savefig("compare_cost_functions.png")
