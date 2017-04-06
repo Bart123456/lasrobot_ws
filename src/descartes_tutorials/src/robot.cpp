@@ -180,7 +180,7 @@ int main(int argc, char** argv)
     planning_scene.world.collision_objects.push_back(utilities::makeCollisionObject(workObjectMeshPath, objectscale, workObjectID, objectpose));
     
     //Planning scene colors
-    planning_scene.object_colors.push_back(utilities::makeObjectColor(workObjectID, 0.5, 0.5, 0.5, 0.8));
+    planning_scene.object_colors.push_back(utilities::makeObjectColor(workObjectID, 0.5, 0.5, 0.5, 1.0));
   } else {
     rosbag::Bag bag2(bagReadFilePath, rosbag::bagmode::Read);
     rosbag::View view(bag2, rosbag::TopicQuery("planningscene"));
@@ -220,7 +220,7 @@ int main(int argc, char** argv)
   //Define Poses
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
-  centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
+  centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.314, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
   poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
 
   int tempSize;
