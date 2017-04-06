@@ -228,7 +228,7 @@ int main(int argc, char** argv)
   startPose = descartes_core::utils::toFrame(objectX, objectY + 0.025, objectZ + 0.025, (M_PI / 2) + M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
   endPose = descartes_core::utils::toFrame(objectX + 0.4, objectY + 0.025, objectZ + 0.025, (M_PI / 2) + M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
 
-  poses = poseGeneration::straightLine(startPose, endPose, 500);
+  poses = poseGeneration::straightLine(startPose, endPose, 50);
 
   int tempSize;
   tempSize = poses.size();
@@ -298,7 +298,7 @@ int main(int argc, char** argv)
   }
 
   // 2. Create a robot model and initialize it
-  descartes_core::RobotModelPtr model (new descartes_moveit::IkFastMoveitStateAdapter);
+  descartes_core::RobotModelPtr model (new descartes_moveit::MoveitStateAdapter); //IkFastMoveitStateAdapter
   
   //Enable collision checking
   model->setCheckCollisions(collisionChecking);
