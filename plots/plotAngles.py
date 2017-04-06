@@ -1,5 +1,8 @@
 import rosbag
-bag = rosbag.Bag('test.bag')
+import matplotlib.pyplot as plt
+
+# read bag files
+bag = rosbag.Bag('L_profile_without_weldingcost.bag')
 points = []
 for topic, msg, t in bag.read_messages(topics=['trajectory']):
     points = msg.points
@@ -25,9 +28,19 @@ for joints in joint_positions:
 	joint5.append(joints[4])
 	joint6.append(joints[5])
 
-import matplotlib.pyplot as plt
-plt.plot(time, joint1, 'b', time, joint2, 'g',time, joint3, 'r',time, joint4, 'c',time, joint5, 'm',time, joint6, 'y')
-plt.ylabel('Joint angles')
-plt.xlabel('Time in seconds')
-plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
+#~ import matplotlib.pyplot as plt
+#~ plt.plot(time, joint1, 'b', time, joint2, 'g',time, joint3, 'r',time, joint4, 'c',time, joint5, 'm',time, joint6, 'y')
+#~ plt.ylabel('Joint angles [rad]')
+#~ plt.xlabel('Time [s]')
+#~ plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
+#~ plt.show()
+
+jwithout = [[],[],[],[],[],[]]
+for joints in joint_positions:
+	for i in range(0, 6):
+		jwithout[i].append(joints[i])
+
+plt.figure()
+for i in range(0, 6):
+	plt.plot(time, jwithout[i])
 plt.show()
