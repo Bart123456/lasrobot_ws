@@ -180,7 +180,7 @@ int main(int argc, char** argv)
     planning_scene.world.collision_objects.push_back(utilities::makeCollisionObject(workObjectMeshPath, objectscale, workObjectID, objectpose));
     
     //Planning scene colors
-    planning_scene.object_colors.push_back(utilities::makeObjectColor(workObjectID, 0.5, 0.5, 0.5, 0.8));
+    planning_scene.object_colors.push_back(utilities::makeObjectColor(workObjectID, 0.5, 0.5, 0.5, 1));
   } else {
     rosbag::Bag bag2(bagReadFilePath, rosbag::bagmode::Read);
     rosbag::View view(bag2, rosbag::TopicQuery("planningscene"));

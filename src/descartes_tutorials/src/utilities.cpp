@@ -26,7 +26,7 @@ namespace utilities {
 		Eigen::Affine3d tablepose;
 		tablepose = descartes_core::utils::toFrame(0.3, -0.6, 0.1, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);
 		planningScene.world.collision_objects.push_back(makeCollisionObject("package://kuka_description/meshes/table_clamps/table/Table_scaled.stl", tablescale, "Table", tablepose));
-		planningScene.object_colors.push_back(utilities::makeObjectColor("Table", 0.2, 0.2, 0.2, 1.0));
+		planningScene.object_colors.push_back(utilities::makeObjectColor("Table", 0.8, 0.8, 0.8, 1.0));
 	}
 
 	moveit_msgs::CollisionObject makeCollisionObject(std::string filepath, Eigen::Vector3d scale, std::string ID, Eigen::Affine3d pose)
