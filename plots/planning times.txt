@@ -1,0 +1,3 @@
+cylinder_IKfast_100pt.bag:	90s
+cylinder_KDL_30pt.bag: 		2080s
+cylinder_IKfast_30pt.bag:	27s
