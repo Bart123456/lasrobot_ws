@@ -2,7 +2,7 @@ import rosbag
 import matplotlib.pyplot as plt
 
 # read error of simulation
-bag = rosbag.Bag('L_profile_glitch_test.bag')
+bag = rosbag.Bag('L_profile_glitch_without_cost.bag')
 errorsX = []
 errorsY = []
 points1 = []
