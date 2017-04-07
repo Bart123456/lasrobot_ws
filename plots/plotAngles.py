@@ -45,21 +45,28 @@ bagB.close()
 
 # create plot
 # ===========
+# use same font as in latex http://matplotlib.org/users/usetex.html
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+
 plt.figure(figsize=(8, 4))
 plt.subplot(121)
 for i in range(0, 6):
 	plt.plot(tA, jA[i])
-plt.title("Case A: Cylinder")
-plt.ylabel('Joint angles [rad]')
-plt.xlabel('Time [s]')
+plt.title("Case A: Cylinder", fontsize=18)
+plt.ylabel('Joint angles [rad]', fontsize=18)
+plt.xlabel('Time [s]', fontsize=18)
 #~ plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
 
 plt.subplot(122)
 for i in range(0, 6):
 	plt.plot(tB, jB[i])
-plt.title("Case B: L-profile")
-plt.xlabel('Time [s]')
+plt.title("Case B: L-profile", fontsize=18)
+plt.xlabel('Time [s]', fontsize=18)
 #~ plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
+
+# avoid the x-label from being cut off
+plt.gcf().subplots_adjust(bottom=0.15)
 
 plt.savefig("joint_angles_AB2.png")
 #~ plt.show()
