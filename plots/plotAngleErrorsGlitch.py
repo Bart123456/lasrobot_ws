@@ -24,11 +24,14 @@ bag.close()
 
 
 #remove 'NaN' values from lists (supposed to be 0)
-count = 0
-for error in errorsX:
-	if error == 'nan':
-		errorsX[count] = 0.0
-	count += 1
+# add sign again, because absolute value is given in bag file
+errorsX = list(errorsX)
+for i in range(0, len(errorsX)):
+	if errorsX[i] == 'nan':
+		errorsX[i] = 0.0
+		
+	if i < 223 and i > 204:
+		errorsX[i] = -errorsX[i]
 	
 count = 0
 for error in errorsY:
@@ -46,10 +49,10 @@ for error in errorsY:
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 # create plot
-plt.plot(time1, errorsX, 'k')
-plt.ylabel(r'Deviation $|\gamma_p - \gamma_{ee}|$ [rad]', fontsize=20)
+plt.plot(time1, errorsX, 'k.')
+plt.ylabel(r'Tolerance angle [rad]', fontsize=20)
 plt.xlabel('Time [s]', fontsize=18)
-plt.axis([0, 40, 0, 1])
+plt.axis([0, 40, -1, 1])
 #~ plt.legend(['Improved cost function', 'Standard cost function'], fontsize=18)
-plt.show()
-#~ plt.savefig("cost_function_glitch.png", fontsize=18)
+#~ plt.show()
+plt.savefig("cost_function_glitch.png", fontsize=18)
