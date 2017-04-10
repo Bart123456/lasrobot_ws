@@ -16,7 +16,7 @@
 
 
 // Includes the planner we will be using
-#include <descartes_planner/dense_planner.h>
+#include <descartes_planner/sparse_planner.h>
 //Include visualization markers for RViz
 //#include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
@@ -318,13 +318,13 @@ int main(int argc, char** argv)
   //model->updateInternals();
 
   // 3. Create a planner and initialize it with our robot model
-  descartes_planner::DensePlanner planner;
+  descartes_planner::SparsePlanner planner;
   planner.initialize(model);
 
   //Use the extra weldingscost or not
-  planner.getPlanningGraph().setUseWeldingCost(useWeldingCost);
+  // planner.getPlanningGraph().setUseWeldingCost(useWeldingCost);
   //Set the weldingcost weight:
-  planner.getPlanningGraph().setWeldingCostFactor(weldingCostWeight);
+  // planner.getPlanningGraph().setWeldingCostFactor(weldingCostWeight);
 
   //Don't plan path if it is read from file.
   if(!readTrajectoryFile)
@@ -349,12 +349,12 @@ int main(int argc, char** argv)
     }
 
     //Extract weldingcosts from result (Don't forget to multiply with the welding weight!)
-    weldingCosts.data.resize(result.size());
-    double costWeight = planner.getPlanningGraph().getWeldingCostFactor();
-    for(int i = 0; i < result.size(); ++i)
-    {
-      weldingCosts.data[i] = result[i]->getWeldingCost() * costWeight;
-    }
+    // weldingCosts.data.resize(result.size());
+    // double costWeight = planner.getPlanningGraph().getWeldingCostFactor();
+    // for(int i = 0; i < result.size(); ++i)
+    // {
+    //   weldingCosts.data[i] = result[i]->getWeldingCost() * costWeight;
+    // }
     
 
     
