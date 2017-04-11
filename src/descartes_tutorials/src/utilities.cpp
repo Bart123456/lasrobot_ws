@@ -21,7 +21,7 @@ namespace utilities {
 
 	void addEnvironment(moveit_msgs::PlanningScene& planningScene)
 	{
-		//Table (Tafel steekt 12mm boven oorsprong uit)
+		//Table (table thickness is 12 mm above origin)
 		Eigen::Vector3d tablescale(1.0,1.0,1.0);
 		Eigen::Affine3d tablepose;
 		tablepose = descartes_core::utils::toFrame(0.3, -0.6, 0.1, 0.0, 0.0, 0.0, descartes_core::utils::EulerConventions::XYZ);

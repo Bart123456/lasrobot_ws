@@ -162,18 +162,18 @@ int main(int argc, char** argv)
   Eigen::Affine3d objectpose;
   
   double objectX, objectY, objectZ, objectrX, objectrY, objectrZ;
-  objectX = 0.8;
+  objectX = 1.0;
   objectY = 0.0;
-  objectZ = 0.112;
+  objectZ = 0.9;
   objectrX = 0.0;
-  objectrY = 0.0;
+  objectrY = -M_PI_2;
   objectrZ = 0.0;
 
   moveit_msgs::PlanningScene planning_scene;
   if(!readTrajectoryFile)
   {
-    //Create collision objects
-    utilities::addEnvironment(planning_scene);
+    //Add welding table
+    //utilities::addEnvironment(planning_scene);
 
 
     objectpose = descartes_core::utils::toFrame(objectX, objectY, objectZ, objectrX, objectrY, objectrZ, descartes_core::utils::EulerConventions::XYZ);
@@ -217,17 +217,14 @@ int main(int argc, char** argv)
     ROS_ERROR("No subscribers connected, collision object not added");
   }
 
-  //Define Poses
-  std::vector<Eigen::Affine3d> poses;
-  //Eigen::Affine3d centerPose;
-  //centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  //poses = poseGeneration::circle(centerPose, 0.054, 15, -(M_PI / 4), 2 * M_PI);
+  //Define trajectory Poses
 
   Eigen::Affine3d startPose;
   Eigen::Affine3d endPose;
-  startPose = descartes_core::utils::toFrame(objectX, objectY + 0.025, objectZ + 0.025, (M_PI / 2) + M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
-  endPose = descartes_core::utils::toFrame(objectX + 0.4, objectY + 0.025, objectZ + 0.025, (M_PI / 2) + M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
+  std::vector<Eigen::Affine3d> poses;
 
+  startPose = descartes_core::utils::toFrame(objectX - 0.025, objectY + 0.025, objectZ, M_PI_2, M_PI_4, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  endPose = descartes_core::utils::toFrame(objectX - 0.025, objectY + 0.025, objectZ + 0.4, M_PI_2, M_PI_4, 0.0, descartes_core::utils::EulerConventions::XYZ);
   poses = poseGeneration::straightLine(startPose, endPose, 50);
 
   int tempSize;
@@ -248,8 +245,8 @@ int main(int argc, char** argv)
   //Define tolerance sizes
   trajectory.setRotStepSize(M_PI/180);
   double rxTolerance, ryTolerance, rzTolerance;
-  rxTolerance = M_PI/4; //M_PI/36;
-  ryTolerance = 0; //M_PI/36;
+  rxTolerance = 0; //M_PI/36;
+  ryTolerance = M_PI_4; //M_PI/36;
   rzTolerance = 0;
 
   for(int i = 0; i < tempSize; ++i)
