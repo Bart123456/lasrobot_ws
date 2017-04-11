@@ -24,7 +24,8 @@ bag.close()
 
 # read bag l profile B
 # ====================
-bagB = rosbag.Bag('sing_l_profile.bag')
+#~ bagB = rosbag.Bag('sing_l_profile.bag')
+bagB = rosbag.Bag('sing_no_weldingcost.bag')
 points = []
 for topic, msg, t in bagB.read_messages(topics=['trajectory']):
     points = msg.points
@@ -68,5 +69,5 @@ plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
 # avoid the x-label from being cut off
 plt.gcf().subplots_adjust(bottom=0.15)
 
-plt.savefig("singular.png")
-#~ plt.show()
+#~ plt.savefig("singular.png")
+plt.show()
