@@ -162,12 +162,12 @@ int main(int argc, char** argv)
   Eigen::Affine3d objectpose;
   
   double objectX, objectY, objectZ, objectrX, objectrY, objectrZ;
-  objectX = 1.0;
-  objectY = 0.0;
+  objectX = 1.5;
+  objectY = -0.2;
   objectZ = 0.9;
   objectrX = 0.0;
-  objectrY = -M_PI_2;
-  objectrZ = 0.0;
+  objectrY = 0.0;
+  objectrZ = M_PI_2;
 
   moveit_msgs::PlanningScene planning_scene;
   if(!readTrajectoryFile)
@@ -223,8 +223,8 @@ int main(int argc, char** argv)
   Eigen::Affine3d endPose;
   std::vector<Eigen::Affine3d> poses;
 
-  startPose = descartes_core::utils::toFrame(objectX - 0.025, objectY + 0.025, objectZ, M_PI_2, M_PI_4, 0.0, descartes_core::utils::EulerConventions::XYZ);
-  endPose = descartes_core::utils::toFrame(objectX - 0.025, objectY + 0.025, objectZ + 0.4, M_PI_2, M_PI_4, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  startPose = descartes_core::utils::toFrame(objectX - 0.025, objectY + 0.4, objectZ + 0.025, -M_PI, M_PI_4, 0.0, descartes_core::utils::EulerConventions::XYZ);
+  endPose = descartes_core::utils::toFrame(objectX - 0.025, objectY, objectZ + 0.025, -M_PI, M_PI_4, 0.0, descartes_core::utils::EulerConventions::XYZ);
   poses = poseGeneration::straightLine(startPose, endPose, 50);
 
   int tempSize;
