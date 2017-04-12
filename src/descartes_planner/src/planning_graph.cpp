@@ -88,6 +88,12 @@ descartes_core::RobotModelConstPtr PlanningGraph::getRobotModel()
 
 bool PlanningGraph::insertGraph(const std::vector<TrajectoryPtPtr>* points)
 {
+  // this is considered the START OF PHASE 1: IK calculations (and collision checking!)
+  // for all cartesian trajectory points
+  // (But there is already some graph overhead here)
+  double phase1StartTime = ros::Time::now().toSec();
+  ROS_INFO_STREAM("<planning_graph.cpp> Start of phase 1");
+
   // validate input
   if (!points)
   {
@@ -147,6 +153,13 @@ bool PlanningGraph::insertGraph(const std::vector<TrajectoryPtPtr>* points)
     return false;
   }
 
+  // END OF PHASE 1
+  double phase1Time = ros::Time::now().toSec() - phase1StartTime;
+  ROS_INFO_STREAM("<planning_graph.cpp> Phase 1: " << phase1Time << " seconds.");
+  // this is considered the START OF PHASE 2: calculating the cost and adding edges and vertices to the graph.
+  double phase2StartTime = ros::Time::now().toSec();
+  ROS_INFO_STREAM("<planning_graph.cpp> Start of phase 2");
+
   ROS_INFO_STREAM("Calculating edge weights.");
 
   std::vector<JointEdge> edges;
@@ -174,6 +187,11 @@ bool PlanningGraph::insertGraph(const std::vector<TrajectoryPtPtr>* points)
   }
 
   ROS_INFO_STREAM("Finished populating graph edges.");
+
+  // END OF PHASE 2
+  double phase2Time = ros::Time::now().toSec() - phase2StartTime;
+  ROS_INFO_STREAM("<planning_graph.cpp> Phase 2: " << phase2Time << " seconds.");
+  // phase 3 is outside this function in dense_planner.cpp (or sparse planner...)
 
   return true;
 }

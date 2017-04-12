@@ -346,7 +346,7 @@ int main(int argc, char** argv)
 
     double planningEnd = ros::Time::now().toSec();
     double planningTime = planningEnd - planningStart;
-    ROS_INFO_STREAM("Passed planning time: " << planningTime << " seconds.");
+    ROS_INFO_STREAM("<robot.cpp> Passed planning time: " << planningTime << " seconds.");
 
     TrajectoryVec result;
     if (!planner.getPath(result))

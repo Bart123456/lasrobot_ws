@@ -206,7 +206,15 @@ bool DensePlanner::planPath(const std::vector<descartes_core::TrajectoryPtPtr>& 
 
   if (planning_graph_->insertGraph(&traj))
   {
+    // this is considered START OF PHASE 3: graph search (Dijkstra)
+    double phase3StartTime = ros::Time::now().toSec();
+    ROS_INFO_STREAM("<dense_planner.cpp> Start of phase 3");
+
     updatePath();
+
+    // END OF PHASE 3
+    double phase3Time = ros::Time::now().toSec() - phase3StartTime;
+    ROS_INFO_STREAM("<dense_planner.cpp> Phase 3: " << phase3Time << " seconds.");
   }
   else
   {
