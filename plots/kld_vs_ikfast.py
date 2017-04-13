@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # read bag cylinder A
 # ===================
-bag = rosbag.Bag('l_kdl.bag')
+bag = rosbag.Bag('l_kdl_20samp.bag')
 points = []
 for topic, msg, t in bag.read_messages(topics=['trajectory']):
     points = msg.points
@@ -53,16 +53,18 @@ plt.figure(figsize=(8, 4))
 plt.subplot(121)
 for i in range(0, 6):
 	plt.plot(tA, jA[i])
-plt.title("Case A: Cylinder", fontsize=18)
+plt.title("Task B with KDL", fontsize=18)
 plt.ylabel('Joint angles [rad]', fontsize=18)
 plt.xlabel('Time [s]', fontsize=18)
+plt.axis([0, 40, -7, 3])
 #~ plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
 
 plt.subplot(122)
 for i in range(0, 6):
 	plt.plot(tB, jB[i])
-plt.title("Case B: L-profile", fontsize=18)
+plt.title("Task B with ikfast", fontsize=18)
 plt.xlabel('Time [s]', fontsize=18)
+plt.axis([0, 40, -7, 3])
 #~ plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
 
 # avoid the x-label from being cut off
