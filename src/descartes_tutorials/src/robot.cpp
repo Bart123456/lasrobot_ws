@@ -47,7 +47,7 @@ typedef TrajectoryVec::const_iterator TrajectoryIter;
  */
 trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory, const descartes_core::RobotModel& model,
-                     const std::vector<std::string>& joint_names, double trajLength, double speed);
+                     const std::vector<std::string>& joint_names, std::vector<double> trajLengths, double speed);
 
 /**
  * Sends a ROS trajectory to the robot controller
@@ -251,13 +251,17 @@ int main(int argc, char** argv)
     //trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
   }
 
+  std::vector<double> trajectoryDistances;
   double trajectoryDistance = 0.0;
   Eigen::Vector3d tempVec;
   for(int i = 0; i < tempSize - 1; ++i)
   {
     tempVec = poses[i + 1].translation() - poses[i].translation();
+    trajectoryDistances.push_back(tempVec.norm());
     trajectoryDistance += tempVec.norm();
   }
+  //Add one extra point for correct size
+  trajectoryDistances.push_back(0.0);
 
   ROS_INFO_STREAM("Total trajectory distance: " << trajectoryDistance);
   
@@ -366,7 +370,7 @@ int main(int argc, char** argv)
     nh.getParam("controller_joint_names", names);
     // Generate a ROS joint trajectory with the result path, robot model, given joint names,
     // a certain time delta between each trajectory point
-    joint_solution = toROSJointTrajectory(result, *model, names, trajectoryDistance, weldingSpeed);
+    joint_solution = toROSJointTrajectory(result, *model, names, trajectoryDistances, weldingSpeed);
 
     //Translate joint solutions to poses using FK and save them in robotPoses
     Eigen::Affine3d eigenPose;
@@ -452,7 +456,7 @@ trajectory_msgs::JointTrajectory
 toROSJointTrajectory(const TrajectoryVec& trajectory,
                      const descartes_core::RobotModel& model,
                      const std::vector<std::string>& joint_names,
-                     double trajLength, double speed)
+                     std::vector<double> trajLengths, double speed)
 {
   // Fill out information about our trajectory
   trajectory_msgs::JointTrajectory result;
@@ -460,9 +464,9 @@ toROSJointTrajectory(const TrajectoryVec& trajectory,
   result.header.frame_id = "world_frame";
   result.joint_names = joint_names;
 
-  //Trajectory timing
-  double trajTime = trajLength / speed;
-  double time_delay = trajTime / trajectory.size();
+  //Trajectory timing counter
+  double time_delay;
+  int counter = 0;
 
   // For keeping track of time-so-far in the trajectory
   double time_offset = 0.0;
@@ -482,6 +486,9 @@ toROSJointTrajectory(const TrajectoryVec& trajectory,
     pt.accelerations.resize(joints.size(), 0.0);
     pt.effort.resize(joints.size(), 0.0);
     // set the time into the trajectory
+    time_delay = trajLengths[counter] / speed;
+    ROS_INFO_STREAM("Calculated time for point: " << counter << " is: " << time_delay << "s.");
+    ++counter;
     pt.time_from_start = ros::Duration(time_offset);
     // increment time
     time_offset += time_delay;
