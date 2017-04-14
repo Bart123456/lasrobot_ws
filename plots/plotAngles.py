@@ -68,5 +68,5 @@ plt.xlabel('Time [s]', fontsize=18)
 # avoid the x-label from being cut off
 plt.gcf().subplots_adjust(bottom=0.15)
 
-plt.savefig("joint_angles_AB2.png")
-#~ plt.show()
+#~ plt.savefig("joint_angles_AB2.png")
+plt.show()
