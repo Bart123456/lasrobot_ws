@@ -117,7 +117,7 @@ EigenSTL::vector_Affine3d uniform(const TolerancedFrame &frame, const double ori
                                 Eigen::AngleAxisd(ry, Eigen::Vector3d::UnitY()) *
                                 Eigen::AngleAxisd(rz, Eigen::Vector3d::UnitZ());*/
               sampled_frame =
-                  descartes_core::utils::toFrame(tx, ty, tz, rx, ry, rz, descartes_core::utils::EulerConventions::XYZ);
+                  descartes_core::utils::toLocalFrame(tx, ty, tz, rx, ry, rz, descartes_core::utils::EulerConventions::XYZ);
               rtn.push_back(sampled_frame);
             }
           }

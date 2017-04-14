@@ -50,7 +50,7 @@ enum EulerConvention
 {
   XYZ = 0,
   ZYX,
-  ZXZ
+  ZXZ,
 };
 }
 
@@ -79,6 +79,51 @@ static Eigen::Affine3d toFrame(double tx, double ty, double tz, double rx, doubl
     case EulerConventions::ZXZ:
       rtn = Eigen::Translation3d(tx, ty, tz) * Eigen::AngleAxisd(rz, Eigen::Vector3d::UnitZ()) *
             Eigen::AngleAxisd(rx, Eigen::Vector3d::UnitX()) * Eigen::AngleAxisd(rz, Eigen::Vector3d::UnitZ());
+      break;
+
+    default:
+      logError("Invalid euler convention entry %i", convention);
+      break;
+  }
+
+  return rtn;
+}
+
+// Use a function declaration so that we can add the 'unused' attribute, which prevents compiler warnings
+static Eigen::Affine3d toLocalFrame(double tx, double ty, double tz, double rx, double ry, double rz,
+                                    int convention = int(EulerConventions::ZYX)) __attribute__((unused));
+
+static Eigen::Affine3d toLocalFrame(double tx, double ty, double tz, 
+                                    double rx, double ry, double rz, int convention)
+{
+  Eigen::Affine3d rtn;
+
+  //Define local vectors
+  Eigen::Vector3d xVector(1.0,0.0,0.0);
+  Eigen::Vector3d yVector(0.0,1.0,0.0);
+  Eigen::Vector3d zVector(0.0,0.0,1.0);
+
+  /*
+  xVector = localFrame.rotation() * xVector;
+  yVector = localFrame.rotation() * yVector;
+  zVector = localFrame.rotation() * zVector;
+  */
+
+  switch (convention)
+  {
+    case EulerConventions::XYZ:
+      rtn = Eigen::Translation3d(tx, ty, tz) * Eigen::AngleAxisd(rx, xVector) *
+            Eigen::AngleAxisd(ry, yVector) * Eigen::AngleAxisd(rz, zVector);
+      break;
+
+    case EulerConventions::ZYX:
+      rtn = Eigen::Translation3d(tx, ty, tz) * Eigen::AngleAxisd(rz, zVector) *
+            Eigen::AngleAxisd(ry, yVector) * Eigen::AngleAxisd(rx, xVector);
+      break;
+
+    case EulerConventions::ZXZ:
+      rtn = Eigen::Translation3d(tx, ty, tz) * Eigen::AngleAxisd(rz, zVector) *
+            Eigen::AngleAxisd(rx, xVector) * Eigen::AngleAxisd(rz, zVector);
       break;
 
     default:
