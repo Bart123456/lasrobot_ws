@@ -1,0 +1,282 @@
+[0m[ INFO] [1492173153.570542223]: Local path found: /home/jeroen/ros/lasrobot_ws/src/descartes_tutorials/Scenarios/trajectories/trajectory.bag[0m
+[0m[ INFO] [1492173153.734105662]: Waiting for planning_scene subscriber.[0m
+[0m[ INFO] [1492173155.766603774]: Object added to the world.[0m
+[0m[ INFO] [1492173155.776800297]: Total trajectory distance: 0.392[0m
+[0m[ INFO] [1492173155.777870492]: Waiting for marker subscribers.[0m
+[0m[ INFO] [1492173157.778093321]: Subscriber found, publishing markers.[0m
+[0m[ INFO] [1492173157.786917773]: Loading robot model 'robot'...[0m
+[0m[ INFO] [1492173157.786987389]: No root/virtual joint specified in SRDF. Assuming fixed joint[0m
+[33m[ WARN] [1492173158.020746237]: Could not identify parent group for end-effector 'lastoorts'[0m
+[0m[ INFO] [1492173158.075180535]: Loading robot model 'robot'...[0m
+[0m[ INFO] [1492173158.075201434]: No root/virtual joint specified in SRDF. Assuming fixed joint[0m
+[33m[ WARN] [1492173158.258517489]: Could not identify parent group for end-effector 'lastoorts'[0m
+[0m[ INFO] [1492173158.740153021]: World frame 'base_link' does not match model root frame '/base_link', all poses will be transformed to world frame 'base_link'[0m
+[0m[ INFO] [1492173158.746925933]: Loading robot model 'robot'...[0m
+[0m[ INFO] [1492173158.746945418]: No root/virtual joint specified in SRDF. Assuming fixed joint[0m
+[33m[ WARN] [1492173158.903965261]: Could not identify parent group for end-effector 'lastoorts'[0m
+[0m[ INFO] [1492173158.955072807]: Loading robot model 'robot'...[0m
+[0m[ INFO] [1492173158.955096345]: No root/virtual joint specified in SRDF. Assuming fixed joint[0m
+[33m[ WARN] [1492173159.121763612]: Could not identify parent group for end-effector 'lastoorts'[0m
+[0m[ INFO] [1492173159.620013817]: updating internals[0m
+[0m[ INFO] [1492173159.902884285]: updated[0m
+[0m[ INFO] [1492173159.902925270]: done[0m
+[0m[ INFO] [1492173159.903331180]: <planning_graph.cpp> Start of phase 1[0m
+[0m[ INFO] [1492173159.903728967]: Calculating joint solutions.[0m
+[0m[ INFO] [1492173160.029587389]: Found *potential* solution on 6 iteration, joint: [-0.197295, 0.283928, 0.643891, 0.548405, 0.803159, 0.956475][0m
+[0m[ INFO] [1492173160.029656560]: Found *new* solution on 6 iteration, joint: [-0.197295, 0.283928, 0.643891, 0.548405, 0.803159, 0.956475][0m
+[0m[ INFO] [1492173160.076166935]: Found *potential* solution on 9 iteration, joint: [-0.197295, 0.283925, 0.643894, -5.73478, 0.803152, -5.32671][0m
+[0m[ INFO] [1492173160.076191412]: Found *new* solution on 9 iteration, joint: [-0.197295, 0.283925, 0.643894, -5.73478, 0.803152, -5.32671][0m
+[0m[ INFO] [1492173160.076207321]: Found 3 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173160.165647143]: Found *potential* solution on 5 iteration, joint: [-0.188555, 0.279164, 0.645459, 0.529324, 0.793308, 0.979073][0m
+[0m[ INFO] [1492173160.165702669]: Found *new* solution on 5 iteration, joint: [-0.188555, 0.279164, 0.645459, 0.529324, 0.793308, 0.979073][0m
+[0m[ INFO] [1492173160.178077320]: Found *potential* solution on 6 iteration, joint: [-0.188556, 0.279155, 0.645462, -2.61226, -0.793304, 4.12066][0m
+[0m[ INFO] [1492173160.178099180]: Found *new* solution on 6 iteration, joint: [-0.188556, 0.279155, 0.645462, -2.61226, -0.793304, 4.12066][0m
+[0m[ INFO] [1492173160.234190260]: Found 3 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173160.307611226]: Found *potential* solution on 4 iteration, joint: [-0.17974, 0.274636, 0.64696, 3.65129, -0.783727, -2.13938][0m
+[0m[ INFO] [1492173160.307634686]: Found *new* solution on 4 iteration, joint: [-0.17974, 0.274636, 0.64696, 3.65129, -0.783727, -2.13938][0m
+[0m[ INFO] [1492173160.345899578]: Found *potential* solution on 7 iteration, joint: [-0.17974, 0.27463, 0.646963, -2.63191, -0.78372, -2.13937][0m
+[0m[ INFO] [1492173160.345922997]: Found *new* solution on 7 iteration, joint: [-0.17974, 0.27463, 0.646963, -2.63191, -0.78372, -2.13937][0m
+[0m[ INFO] [1492173160.383314948]: Found 3 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173160.534158050]: Found *potential* solution on 8 iteration, joint: [-0.170851, 0.270345, 0.648397, -5.79368, 0.774429, 1.02589][0m
+[0m[ INFO] [1492173160.534183581]: Found *new* solution on 8 iteration, joint: [-0.170851, 0.270345, 0.648397, -5.79368, 0.774429, 1.02589][0m
+[0m[ INFO] [1492173160.554452503]: Found 2 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173160.741038213]: Found 1 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173160.774661289]: Found *potential* solution on 2 iteration, joint: [-0.15287, 0.262488, 0.651077, -5.83572, 0.756741, 1.07488][0m
+[0m[ INFO] [1492173160.774684671]: Found *new* solution on 2 iteration, joint: [-0.15287, 0.262488, 0.651077, -5.83572, 0.756741, 1.07488][0m
+[0m[ INFO] [1492173160.910923865]: Found 2 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173160.939141598]: Found *potential* solution on 2 iteration, joint: [-0.143785, 0.258925, 0.652322, 3.5672, -0.748381, -2.0414][0m
+[0m[ INFO] [1492173160.939180392]: Found *new* solution on 2 iteration, joint: [-0.143785, 0.258925, 0.652322, 3.5672, -0.748381, -2.0414][0m
+[0m[ INFO] [1492173160.953765700]: Found *potential* solution on 3 iteration, joint: [-0.143785, 0.258926, 0.652321, -5.85757, 0.74838, -5.18299][0m
+[0m[ INFO] [1492173160.953849789]: Found *new* solution on 3 iteration, joint: [-0.143785, 0.258926, 0.652321, -5.85757, 0.74838, -5.18299][0m
+[0m[ INFO] [1492173161.067963460]: Found 3 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173161.287262085]: Found *potential* solution on 1 iteration, joint: [-0.125445, 0.252547, 0.654615, 0.380275, 0.7327, -5.13077][0m
+[0m[ INFO] [1492173161.287316540]: Found *new* solution on 1 iteration, joint: [-0.125445, 0.252547, 0.654615, 0.380275, 0.7327, -5.13077][0m
+[0m[ INFO] [1492173161.287798121]: Found *potential* solution on 2 iteration, joint: [-0.125445, 0.252549, 0.654615, -2.76132, -0.732702, 4.29401][0m
+[0m[ INFO] [1492173161.287815416]: Found *new* solution on 2 iteration, joint: [-0.125445, 0.252549, 0.654615, -2.76132, -0.732702, 4.29401][0m
+[0m[ INFO] [1492173161.295383386]: Found *potential* solution on 3 iteration, joint: [-0.125445, 0.252549, 0.654615, 0.380275, 0.732702, -5.13077][0m
+[0m[ INFO] [1492173161.295404401]: Found *new* solution on 3 iteration, joint: [-0.125445, 0.252549, 0.654615, 0.380275, 0.732702, -5.13077][0m
+[0m[ INFO] [1492173161.355748654]: Found *potential* solution on 7 iteration, joint: [-0.125445, 0.252549, 0.654615, -2.76132, -0.732702, -1.98917][0m
+[0m[ INFO] [1492173161.355772977]: Found *new* solution on 7 iteration, joint: [-0.125445, 0.252549, 0.654615, -2.76132, -0.732702, -1.98917][0m
+[0m[ INFO] [1492173161.369508873]: Found *potential* solution on 8 iteration, joint: [-0.125445, 0.252549, 0.654615, 3.52187, -0.732702, -1.98917][0m
+[0m[ INFO] [1492173161.369531102]: Found *new* solution on 8 iteration, joint: [-0.125445, 0.252549, 0.654615, 3.52187, -0.732702, -1.98917][0m
+[0m[ INFO] [1492173161.375958614]: Found *potential* solution on 9 iteration, joint: [-0.125445, 0.252549, 0.654615, -5.90291, 0.732702, 1.15242][0m
+[0m[ INFO] [1492173161.375973955]: Found *new* solution on 9 iteration, joint: [-0.125445, 0.252549, 0.654615, -5.90291, 0.732702, 1.15242][0m
+[0m[ INFO] [1492173161.375983487]: Found 7 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173161.408500588]: Found *potential* solution on 2 iteration, joint: [-0.116198, 0.249736, 0.655669, -2.78479, -0.725412, 4.32091][0m
+[0m[ INFO] [1492173161.408521359]: Found *new* solution on 2 iteration, joint: [-0.116198, 0.249736, 0.655669, -2.78479, -0.725412, 4.32091][0m
+[0m[ INFO] [1492173161.415983572]: Found *potential* solution on 3 iteration, joint: [-0.116198, 0.249737, 0.655665, 0.356807, 0.725414, 1.17932][0m
+[0m[ INFO] [1492173161.416027262]: Found *new* solution on 3 iteration, joint: [-0.116198, 0.249737, 0.655665, 0.356807, 0.725414, 1.17932][0m
+[0m[ INFO] [1492173161.429474090]: Found *potential* solution on 4 iteration, joint: [-0.116198, 0.249737, 0.655665, 3.4984, -0.725414, -1.96227][0m
+[0m[ INFO] [1492173161.429532470]: Found *new* solution on 4 iteration, joint: [-0.116198, 0.249737, 0.655665, 3.4984, -0.725414, -1.96227][0m
+[0m[ INFO] [1492173161.456329637]: Found *potential* solution on 6 iteration, joint: [-0.116198, 0.249737, 0.655665, -2.78479, -0.725414, 4.32091][0m
+[0m[ INFO] [1492173161.456359253]: Found *new* solution on 6 iteration, joint: [-0.116198, 0.249737, 0.655665, -2.78479, -0.725414, 4.32091][0m
+[0m[ INFO] [1492173161.484355793]: Found *potential* solution on 8 iteration, joint: [-0.116198, 0.249737, 0.655666, 0.356807, 0.725414, -5.10387][0m
+[0m[ INFO] [1492173161.484405313]: Found *new* solution on 8 iteration, joint: [-0.116198, 0.249737, 0.655666, 0.356807, 0.725414, -5.10387][0m
+[0m[ INFO] [1492173161.498204512]: Found *potential* solution on 9 iteration, joint: [-0.116198, 0.249736, 0.655666, -2.78479, -0.725414, -1.96227][0m
+[0m[ INFO] [1492173161.498230743]: Found *new* solution on 9 iteration, joint: [-0.116198, 0.249736, 0.655666, -2.78479, -0.725414, -1.96227][0m
+[0m[ INFO] [1492173161.498242760]: Found 7 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173161.662368777]: Found *potential* solution on 9 iteration, joint: [-0.106905, 0.247179, 0.656651, -2.80877, -0.718514, 4.34832][0m
+[0m[ INFO] [1492173161.662391025]: Found *new* solution on 9 iteration, joint: [-0.106905, 0.247179, 0.656651, -2.80877, -0.718514, 4.34832][0m
+[0m[ INFO] [1492173161.662414810]: Found 2 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173161.755169855]: Found *potential* solution on 5 iteration, joint: [-0.0975711, 0.244869, 0.657579, -2.83325, -0.712018, 4.37621][0m
+[0m[ INFO] [1492173161.755199523]: Found *new* solution on 5 iteration, joint: [-0.0975711, 0.244869, 0.657579, -2.83325, -0.712018, 4.37621][0m
+[0m[ INFO] [1492173161.780555659]: Found *potential* solution on 7 iteration, joint: [-0.097571, 0.244877, 0.657574, 3.44993, -0.712015, 4.37622][0m
+[0m[ INFO] [1492173161.780603946]: Found *new* solution on 7 iteration, joint: [-0.097571, 0.244877, 0.657574, 3.44993, -0.712015, 4.37622][0m
+[0m[ INFO] [1492173161.813026300]: Found *potential* solution on 9 iteration, joint: [-0.097571, 0.244877, 0.657573, 3.44993, -0.712015, -1.90696][0m
+[0m[ INFO] [1492173161.813052010]: Found *new* solution on 9 iteration, joint: [-0.097571, 0.244877, 0.657573, 3.44993, -0.712015, -1.90696][0m
+[0m[ INFO] [1492173161.813065659]: Found 4 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173161.840064202]: Found *potential* solution on 2 iteration, joint: [-0.0881996, 0.242833, 0.658431, -2.85822, -0.705932, 4.4046][0m
+[0m[ INFO] [1492173161.840086702]: Found *new* solution on 2 iteration, joint: [-0.0881996, 0.242833, 0.658431, -2.85822, -0.705932, 4.4046][0m
+[0m[ INFO] [1492173161.880274199]: Found *potential* solution on 5 iteration, joint: [-0.0881996, 0.242833, 0.658431, -5.99981, 0.705932, -5.02018][0m
+[0m[ INFO] [1492173161.880320317]: Found *new* solution on 5 iteration, joint: [-0.0881996, 0.242833, 0.658431, -5.99981, 0.705932, -5.02018][0m
+[0m[ INFO] [1492173161.900559031]: Found *potential* solution on 7 iteration, joint: [-0.0881996, 0.242833, 0.658431, -5.99981, 0.705932, -5.02018][0m
+[0m[ INFO] [1492173161.900588254]: Found *new* solution on 7 iteration, joint: [-0.0881996, 0.242833, 0.658431, -5.99981, 0.705932, -5.02018][0m
+[0m[ INFO] [1492173161.940311713]: Found 4 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173161.967744629]: Found *potential* solution on 2 iteration, joint: [-0.0788011, 0.241045, 0.659235, -2.88363, -0.700271, 4.43341][0m
+[0m[ INFO] [1492173161.967766913]: Found *new* solution on 2 iteration, joint: [-0.0788011, 0.241045, 0.659235, -2.88363, -0.700271, 4.43341][0m
+[0m[ INFO] [1492173161.994431841]: Found *potential* solution on 4 iteration, joint: [-0.0787953, 0.241047, 0.659224, -6.02523, 0.700279, -4.99135][0m
+[0m[ INFO] [1492173161.994454453]: Found *new* solution on 4 iteration, joint: [-0.0787953, 0.241047, 0.659224, -6.02523, 0.700279, -4.99135][0m
+[0m[ INFO] [1492173162.007269409]: Found *potential* solution on 5 iteration, joint: [-0.0787953, 0.241046, 0.659225, 3.39954, -0.70028, -1.84976][0m
+[0m[ INFO] [1492173162.007323028]: Found *new* solution on 5 iteration, joint: [-0.0787953, 0.241046, 0.659225, 3.39954, -0.70028, -1.84976][0m
+[0m[ INFO] [1492173162.007881227]: Found *potential* solution on 6 iteration, joint: [-0.0787953, 0.241047, 0.659224, -6.02523, 0.700279, -4.99135][0m
+[0m[ INFO] [1492173162.007897729]: Found *new* solution on 6 iteration, joint: [-0.0787953, 0.241047, 0.659224, -6.02523, 0.700279, -4.99135][0m
+[0m[ INFO] [1492173162.036222348]: Found *potential* solution on 8 iteration, joint: [-0.0787953, 0.241047, 0.659224, 0.257952, 0.700279, -4.99135][0m
+[0m[ INFO] [1492173162.036252097]: Found *new* solution on 8 iteration, joint: [-0.0787953, 0.241047, 0.659224, 0.257952, 0.700279, -4.99135][0m
+[0m[ INFO] [1492173162.057783432]: Found 6 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173162.155789118]: Found *potential* solution on 6 iteration, joint: [-0.0693627, 0.239521, 0.659953, -6.05109, 0.695069, -4.9621][0m
+[0m[ INFO] [1492173162.155812639]: Found *new* solution on 6 iteration, joint: [-0.0693627, 0.239521, 0.659953, -6.05109, 0.695069, -4.9621][0m
+[0m[ INFO] [1492173162.215027181]: Found 2 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173162.235842125]: Found *potential* solution on 2 iteration, joint: [-0.0599058, 0.238257, 0.660617, -2.93575, -0.690314, 4.49234][0m
+[0m[ INFO] [1492173162.235865421]: Found *new* solution on 2 iteration, joint: [-0.0599058, 0.238257, 0.660617, -2.93575, -0.690314, 4.49234][0m
+[0m[ INFO] [1492173162.243152832]: Found *potential* solution on 3 iteration, joint: [-0.0599058, 0.238257, 0.660617, 3.34743, -0.690314, -1.79085][0m
+[0m[ INFO] [1492173162.243180895]: Found *new* solution on 3 iteration, joint: [-0.0599058, 0.238257, 0.660617, 3.34743, -0.690314, -1.79085][0m
+[0m[ INFO] [1492173162.311205688]: Found *potential* solution on 7 iteration, joint: [-0.0599058, 0.238256, 0.660617, -2.93575, -0.690315, 4.49234][0m
+[0m[ INFO] [1492173162.311278586]: Found *new* solution on 7 iteration, joint: [-0.0599058, 0.238256, 0.660617, -2.93575, -0.690315, 4.49234][0m
+[0m[ INFO] [1492173162.352387109]: Found 4 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173162.379938205]: Found *potential* solution on 2 iteration, joint: [-0.0504297, 0.237254, 0.661217, -2.96238, -0.686026, 4.52236][0m
+[0m[ INFO] [1492173162.379973712]: Found *new* solution on 2 iteration, joint: [-0.0504297, 0.237254, 0.661217, -2.96238, -0.686026, 4.52236][0m
+[0m[ INFO] [1492173162.432095566]: Found *potential* solution on 5 iteration, joint: [-0.0504297, 0.237254, 0.661217, -6.10397, 0.686026, 1.38077][0m
+[0m[ INFO] [1492173162.432125432]: Found *new* solution on 5 iteration, joint: [-0.0504297, 0.237254, 0.661217, -6.10397, 0.686026, 1.38077][0m
+[0m[ INFO] [1492173162.459373880]: Found *potential* solution on 7 iteration, joint: [-0.0504297, 0.237254, 0.661217, -2.96238, -0.686026, 4.52236][0m
+[0m[ INFO] [1492173162.459395233]: Found *new* solution on 7 iteration, joint: [-0.0504297, 0.237254, 0.661217, -2.96238, -0.686026, 4.52236][0m
+[0m[ INFO] [1492173162.498711083]: Found 4 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173162.526070293]: Found *potential* solution on 2 iteration, joint: [-0.0409385, 0.236515, 0.661752, -2.98934, -0.682215, 4.55272][0m
+[0m[ INFO] [1492173162.526092848]: Found *new* solution on 2 iteration, joint: [-0.0409385, 0.236515, 0.661752, -2.98934, -0.682215, 4.55272][0m
+[0m[ INFO] [1492173162.665281405]: Found 2 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173162.698691966]: Found *potential* solution on 2 iteration, joint: [-0.0314363, 0.236037, 0.662224, -3.01661, -0.678889, 4.58338][0m
+[0m[ INFO] [1492173162.698713033]: Found *new* solution on 2 iteration, joint: [-0.0314363, 0.236037, 0.662224, -3.01661, -0.678889, 4.58338][0m
+[0m[ INFO] [1492173162.841675967]: Found 2 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173163.016241361]: Found 1 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173163.061101353]: Found *potential* solution on 3 iteration, joint: [-0.0124216, 0.235881, 0.66297, 3.21133, -0.673737, -1.63777][0m
+[0m[ INFO] [1492173163.061131098]: Found *new* solution on 3 iteration, joint: [-0.0124216, 0.235881, 0.66297, 3.21133, -0.673737, -1.63777][0m
+[0m[ INFO] [1492173163.126390733]: Found *potential* solution on 7 iteration, joint: [-0.0124216, 0.235881, 0.66297, 3.21134, -0.673737, -1.63777][0m
+[0m[ INFO] [1492173163.126411953]: Found *new* solution on 7 iteration, joint: [-0.0124216, 0.235881, 0.66297, 3.21134, -0.673737, -1.63777][0m
+[0m[ INFO] [1492173163.166567609]: Found 3 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173163.302824488]: Found *potential* solution on 7 iteration, joint: [-0.00291486, 0.236197, 0.663247, 0.0418442, 0.671919, -4.74806][0m
+[0m[ INFO] [1492173163.302854302]: Found *new* solution on 7 iteration, joint: [-0.00291486, 0.236197, 0.663247, 0.0418442, 0.671919, -4.74806][0m
+[0m[ INFO] [1492173163.342122355]: Found 2 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173163.530440963]: Found 1 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173163.550956166]: Found *potential* solution on 1 iteration, joint: [0.016064, 0.237627, 0.663601, 3.12732, -0.669823, 4.73965][0m
+[0m[ INFO] [1492173163.550982993]: Found *new* solution on 1 iteration, joint: [0.016064, 0.237627, 0.663601, 3.12732, -0.669823, 4.73965][0m
+[0m[ INFO] [1492173163.558190160]: Found *potential* solution on 2 iteration, joint: [0.016064, 0.237628, 0.6636, -0.0142744, 0.669824, 1.59805][0m
+[0m[ INFO] [1492173163.558231056]: Found *new* solution on 2 iteration, joint: [0.016064, 0.237628, 0.6636, -0.0142744, 0.669824, 1.59805][0m
+[0m[ INFO] [1492173163.665012015]: Found *potential* solution on 8 iteration, joint: [0.016064, 0.237628, 0.6636, 3.12732, -0.669824, -1.54354][0m
+[0m[ INFO] [1492173163.665082487]: Found *new* solution on 8 iteration, joint: [0.016064, 0.237628, 0.6636, 3.12732, -0.669824, -1.54354][0m
+[0m[ INFO] [1492173163.684310143]: Found 4 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173163.732087276]: Found *potential* solution on 3 iteration, joint: [0.0255308, 0.238739, 0.663679, -3.18399, -0.669551, 4.77118][0m
+[0m[ INFO] [1492173163.732151359]: Found *new* solution on 3 iteration, joint: [0.0255308, 0.238739, 0.663679, -3.18399, -0.669551, 4.77118][0m
+[0m[ INFO] [1492173163.770730039]: Found *potential* solution on 6 iteration, joint: [0.0255302, 0.238735, 0.663682, -0.0423926, 0.669552, 1.62958][0m
+[0m[ INFO] [1492173163.770753684]: Found *new* solution on 6 iteration, joint: [0.0255302, 0.238735, 0.663682, -0.0423926, 0.669552, 1.62958][0m
+[0m[ INFO] [1492173163.796719790]: Found *potential* solution on 8 iteration, joint: [0.0255308, 0.238739, 0.663679, -3.18399, -0.669551, -1.512][0m
+[0m[ INFO] [1492173163.796761695]: Found *new* solution on 8 iteration, joint: [0.0255308, 0.238739, 0.663679, -3.18399, -0.669551, -1.512][0m
+[0m[ INFO] [1492173163.816005396]: Found 4 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173163.961091714]: Found *potential* solution on 8 iteration, joint: [0.0349756, 0.240113, 0.663692, 3.0711, -0.669796, -1.48049][0m
+[0m[ INFO] [1492173163.961120735]: Found *new* solution on 8 iteration, joint: [0.0349756, 0.240113, 0.663692, 3.0711, -0.669796, -1.48049][0m
+[0m[ INFO] [1492173163.980070015]: Found 2 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173164.169520372]: Found 1 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173164.341615934]: Found 1 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173164.374084342]: Found *potential* solution on 2 iteration, joint: [0.0631342, 0.24581, 0.663332, -0.154162, 0.67361, 1.75509][0m
+[0m[ INFO] [1492173164.374107060]: Found *new* solution on 2 iteration, joint: [0.0631342, 0.24581, 0.663332, -0.154162, 0.67361, 1.75509][0m
+[0m[ INFO] [1492173164.458402614]: Found *potential* solution on 7 iteration, joint: [0.0631349, 0.24581, 0.663332, -0.154166, 0.673611, 1.75509][0m
+[0m[ INFO] [1492173164.458461167]: Found *new* solution on 7 iteration, joint: [0.0631349, 0.24581, 0.663332, -0.154166, 0.673611, 1.75509][0m
+[0m[ INFO] [1492173164.466148296]: Found *potential* solution on 8 iteration, joint: [0.0631345, 0.245808, 0.663334, -3.29575, -0.673611, -1.38651][0m
+[0m[ INFO] [1492173164.466171572]: Found *new* solution on 8 iteration, joint: [0.0631345, 0.245808, 0.663334, -3.29575, -0.673611, -1.38651][0m
+[0m[ INFO] [1492173164.478866444]: Found *potential* solution on 9 iteration, joint: [0.0631342, 0.24581, 0.663332, -3.29575, -0.67361, -1.3865][0m
+[0m[ INFO] [1492173164.478882154]: Found *new* solution on 9 iteration, joint: [0.0631342, 0.24581, 0.663332, -3.29575, -0.67361, -1.3865][0m
+[0m[ INFO] [1492173164.478895829]: Found 5 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173164.591468279]: Found *potential* solution on 6 iteration, joint: [0.0724469, 0.248231, 0.663078, -3.32328, -0.675894, 4.92766][0m
+[0m[ INFO] [1492173164.591521264]: Found *new* solution on 6 iteration, joint: [0.0724469, 0.248231, 0.663078, -3.32328, -0.675894, 4.92766][0m
+[0m[ INFO] [1492173164.630259931]: Found *potential* solution on 9 iteration, joint: [0.0724468, 0.248231, 0.663078, 2.95991, -0.675893, 4.92766][0m
+[0m[ INFO] [1492173164.630283214]: Found *new* solution on 9 iteration, joint: [0.0724468, 0.248231, 0.663078, 2.95991, -0.675893, 4.92766][0m
+[0m[ INFO] [1492173164.630297425]: Found 3 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173164.785364686]: Found *potential* solution on 8 iteration, joint: [0.0817155, 0.250909, 0.662757, 6.07423, 0.678672, -4.46638][0m
+[0m[ INFO] [1492173164.785413987]: Found *new* solution on 8 iteration, joint: [0.0817155, 0.250909, 0.662757, 6.07423, 0.678672, -4.46638][0m
+[0m[ INFO] [1492173164.803925828]: Found 2 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173164.928449235]: Found *potential* solution on 6 iteration, joint: [0.090936, 0.253845, 0.662367, 6.04726, 0.681937, -4.43592][0m
+[0m[ INFO] [1492173164.928507076]: Found *new* solution on 6 iteration, joint: [0.090936, 0.253845, 0.662367, 6.04726, 0.681937, -4.43592][0m
+[0m[ INFO] [1492173164.935134746]: Found *potential* solution on 7 iteration, joint: [0.090936, 0.253845, 0.662367, 2.90567, -0.681937, 4.98886][0m
+[0m[ INFO] [1492173164.935152924]: Found *new* solution on 7 iteration, joint: [0.090936, 0.253845, 0.662367, 2.90567, -0.681937, 4.98886][0m
+[0m[ INFO] [1492173164.974065598]: Found 3 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173164.995775001]: Found *potential* solution on 2 iteration, joint: [0.100104, 0.257036, 0.66191, 2.87903, -0.685679, -1.2642][0m
+[0m[ INFO] [1492173164.995796691]: Found *new* solution on 2 iteration, joint: [0.100104, 0.257036, 0.66191, 2.87903, -0.685679, -1.2642][0m
+[0m[ INFO] [1492173165.028796017]: Found *potential* solution on 4 iteration, joint: [0.100104, 0.257036, 0.66191, 2.87903, -0.68568, 5.01899][0m
+[0m[ INFO] [1492173165.028818356]: Found *new* solution on 4 iteration, joint: [0.100104, 0.257036, 0.66191, 2.87903, -0.68568, 5.01899][0m
+[0m[ INFO] [1492173165.035564256]: Found *potential* solution on 5 iteration, joint: [0.100104, 0.257036, 0.66191, -3.40415, -0.68568, -1.2642][0m
+[0m[ INFO] [1492173165.035599893]: Found *new* solution on 5 iteration, joint: [0.100104, 0.257036, 0.66191, -3.40415, -0.68568, -1.2642][0m
+[0m[ INFO] [1492173165.106840908]: Found *potential* solution on 9 iteration, joint: [0.100104, 0.257036, 0.66191, 2.87903, -0.68568, -1.2642][0m
+[0m[ INFO] [1492173165.106861363]: Found *new* solution on 9 iteration, joint: [0.100104, 0.257036, 0.66191, 2.87903, -0.68568, -1.2642][0m
+[0m[ INFO] [1492173165.106907425]: Found 5 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173165.181056229]: Found *potential* solution on 4 iteration, joint: [0.109216, 0.260481, 0.661383, 5.99436, 0.689889, -4.37602][0m
+[0m[ INFO] [1492173165.181089008]: Found *new* solution on 4 iteration, joint: [0.109216, 0.260481, 0.661383, 5.99436, 0.689889, -4.37602][0m
+[0m[ INFO] [1492173165.189289661]: Found *potential* solution on 5 iteration, joint: [0.109216, 0.260481, 0.661383, -0.288824, 0.689889, -4.37602][0m
+[0m[ INFO] [1492173165.189315456]: Found *new* solution on 5 iteration, joint: [0.109216, 0.260481, 0.661383, -0.288824, 0.689889, -4.37602][0m
+[0m[ INFO] [1492173165.189747443]: Found *potential* solution on 6 iteration, joint: [0.109216, 0.260481, 0.661383, 5.99436, 0.689889, -4.37602][0m
+[0m[ INFO] [1492173165.189763521]: Found *new* solution on 6 iteration, joint: [0.109216, 0.260481, 0.661383, 5.99436, 0.689889, -4.37602][0m
+[0m[ INFO] [1492173165.203370864]: Found *potential* solution on 7 iteration, joint: [0.109216, 0.260481, 0.661383, 2.85277, -0.689888, 5.04876][0m
+[0m[ INFO] [1492173165.203386070]: Found *new* solution on 7 iteration, joint: [0.109216, 0.260481, 0.661383, 2.85277, -0.689888, 5.04876][0m
+[0m[ INFO] [1492173165.244273557]: Found 5 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173165.285452908]: Found *potential* solution on 3 iteration, joint: [0.118267, 0.264177, 0.660788, 2.82691, -0.694553, -1.20505][0m
+[0m[ INFO] [1492173165.285486044]: Found *new* solution on 3 iteration, joint: [0.118267, 0.264177, 0.660788, 2.82691, -0.694553, -1.20505][0m
+[0m[ INFO] [1492173165.292178456]: Found *potential* solution on 4 iteration, joint: [0.118266, 0.264173, 0.660788, 5.96851, 0.694556, -4.34664][0m
+[0m[ INFO] [1492173165.292196476]: Found *new* solution on 4 iteration, joint: [0.118266, 0.264173, 0.660788, 5.96851, 0.694556, -4.34664][0m
+[0m[ INFO] [1492173165.390526222]: Found 3 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173165.417120218]: Found *potential* solution on 2 iteration, joint: [0.127253, 0.268122, 0.660124, 2.80149, -0.699659, -1.17609][0m
+[0m[ INFO] [1492173165.417146823]: Found *new* solution on 2 iteration, joint: [0.127253, 0.268122, 0.660124, 2.80149, -0.699659, -1.17609][0m
+[0m[ INFO] [1492173165.423671782]: Found *potential* solution on 3 iteration, joint: [0.127253, 0.268119, 0.660125, 5.94309, 0.699657, -4.31769][0m
+[0m[ INFO] [1492173165.423689807]: Found *new* solution on 3 iteration, joint: [0.127253, 0.268119, 0.660125, 5.94309, 0.699657, -4.31769][0m
+[0m[ INFO] [1492173165.451730569]: Found *potential* solution on 5 iteration, joint: [0.127253, 0.268122, 0.660124, 2.80149, -0.699659, 5.1071][0m
+[0m[ INFO] [1492173165.451754012]: Found *new* solution on 5 iteration, joint: [0.127253, 0.268122, 0.660124, 2.80149, -0.699659, 5.1071][0m
+[0m[ INFO] [1492173165.530359040]: Found 4 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173165.577452565]: Found *potential* solution on 3 iteration, joint: [0.136172, 0.272315, 0.65939, -0.365066, 0.705196, -4.28916][0m
+[0m[ INFO] [1492173165.577476249]: Found *new* solution on 3 iteration, joint: [0.136172, 0.272315, 0.65939, -0.365066, 0.705196, -4.28916][0m
+[0m[ INFO] [1492173165.662128709]: Found *potential* solution on 8 iteration, joint: [0.136172, 0.272315, 0.65939, -0.365066, 0.705196, -4.28916][0m
+[0m[ INFO] [1492173165.662149372]: Found *new* solution on 8 iteration, joint: [0.136172, 0.272315, 0.65939, -0.365066, 0.705196, -4.28916][0m
+[0m[ INFO] [1492173165.682978248]: Found 3 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173165.716922154]: Found *potential* solution on 2 iteration, joint: [0.145018, 0.276753, 0.658586, 2.75205, -0.711149, -1.11952][0m
+[0m[ INFO] [1492173165.716949843]: Found *new* solution on 2 iteration, joint: [0.145018, 0.276753, 0.658586, 2.75205, -0.711149, -1.11952][0m
+[0m[ INFO] [1492173165.829374229]: Found *potential* solution on 8 iteration, joint: [0.145018, 0.276753, 0.658586, 5.89364, 0.711149, -4.26112][0m
+[0m[ INFO] [1492173165.829413302]: Found *new* solution on 8 iteration, joint: [0.145018, 0.276753, 0.658586, 5.89364, 0.711149, -4.26112][0m
+[0m[ INFO] [1492173165.844261877]: Found *potential* solution on 9 iteration, joint: [0.145013, 0.276757, 0.658596, 5.89363, 0.711132, 2.02208][0m
+[0m[ INFO] [1492173165.844337518]: Found *new* solution on 9 iteration, joint: [0.145013, 0.276757, 0.658596, 5.89363, 0.711132, 2.02208][0m
+[0m[ INFO] [1492173165.844355360]: Found 4 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173165.872757512]: Found *potential* solution on 2 iteration, joint: [0.153789, 0.281432, 0.657711, 2.72808, -0.717503, -1.09196][0m
+[0m[ INFO] [1492173165.872783926]: Found *new* solution on 2 iteration, joint: [0.153789, 0.281432, 0.657711, 2.72808, -0.717503, -1.09196][0m
+[0m[ INFO] [1492173165.947699219]: Found *potential* solution on 6 iteration, joint: [0.153789, 0.281432, 0.657712, -3.55511, -0.717503, 5.19122][0m
+[0m[ INFO] [1492173165.947748635]: Found *new* solution on 6 iteration, joint: [0.153789, 0.281432, 0.657712, -3.55511, -0.717503, 5.19122][0m
+[0m[ INFO] [1492173165.987186012]: Found *potential* solution on 9 iteration, joint: [0.153789, 0.281432, 0.657711, 2.72808, -0.717503, -1.09196][0m
+[0m[ INFO] [1492173165.987206829]: Found *new* solution on 9 iteration, joint: [0.153789, 0.281432, 0.657711, 2.72808, -0.717503, -1.09196][0m
+[0m[ INFO] [1492173165.987247776]: Found 4 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173166.008567495]: Found *potential* solution on 1 iteration, joint: [0.162481, 0.286352, 0.656766, 5.84622, 0.724246, 2.07668][0m
+[0m[ INFO] [1492173166.008610798]: Found *new* solution on 1 iteration, joint: [0.162481, 0.286352, 0.656766, 5.84622, 0.724246, 2.07668][0m
+[0m[ INFO] [1492173166.009077406]: Found *potential* solution on 2 iteration, joint: [0.162481, 0.286352, 0.656766, 2.70463, -0.724246, -1.06491][0m
+[0m[ INFO] [1492173166.009092528]: Found *new* solution on 2 iteration, joint: [0.162481, 0.286352, 0.656766, 2.70463, -0.724246, -1.06491][0m
+[0m[ INFO] [1492173166.023105603]: Found *potential* solution on 3 iteration, joint: [0.162481, 0.286352, 0.656766, -0.436965, 0.724245, -4.2065][0m
+[0m[ INFO] [1492173166.023145785]: Found *new* solution on 3 iteration, joint: [0.162481, 0.286352, 0.656766, -0.436965, 0.724245, -4.2065][0m
+[0m[ INFO] [1492173166.056011264]: Found *potential* solution on 5 iteration, joint: [0.162482, 0.286347, 0.656769, -0.436967, 0.724248, 2.07669][0m
+[0m[ INFO] [1492173166.056033006]: Found *new* solution on 5 iteration, joint: [0.162482, 0.286347, 0.656769, -0.436967, 0.724248, 2.07669][0m
+[0m[ INFO] [1492173166.096297925]: Found *potential* solution on 8 iteration, joint: [0.162481, 0.286352, 0.656766, 5.84622, 0.724246, 2.07668][0m
+[0m[ INFO] [1492173166.096317881]: Found *new* solution on 8 iteration, joint: [0.162481, 0.286352, 0.656766, 5.84622, 0.724246, 2.07668][0m
+[0m[ INFO] [1492173166.110748735]: Found *potential* solution on 9 iteration, joint: [0.162481, 0.286352, 0.656767, 2.70463, -0.724244, -1.06491][0m
+[0m[ INFO] [1492173166.110794012]: Found *new* solution on 9 iteration, joint: [0.162481, 0.286352, 0.656767, 2.70463, -0.724244, -1.06491][0m
+[0m[ INFO] [1492173166.110805604]: Found 7 joint solutions out of 10 iterations[0m
+[0m[ INFO] [1492173166.131557365]: Found *potential* solution on 1 iteration, joint: [0.17109, 0.291505, 0.655751, 5.82331, 0.731359, -4.17997][0m
+[0m[ INFO] [1492173166.131602974]: Found *new* solution on 1 iteration, joint: [0.17109, 0.291505, 0.655751, 5.82331, 0.731359, -4.17997][0m
+[0m[ INFO] [1492173166.132095509]: Found *potential* solution on 2 iteration, joint: [0.171091, 0.291508, 0.65575, 2.68171, -0.731361, -1.03837][0m
+[0m[ INFO] [1492173166.132134520]: Found *new* solution on 2 iteration, joint: [0.171091, 0.291508, 0.65575, 2.68171, -0.731361, -1.03837][0m
+[0m[ INFO] [1492173166.158967560]: Found *potential* solution on 4 iteration, joint: [0.171091, 0.291506, 0.655751, 2.68171, -0.731357, 5.24482][0m
+[0m[ INFO] [1492173166.158987940]: Found *new* solution on 4 iteration, joint: [0.171091, 0.291506, 0.655751, 2.68171, -0.731357, 5.24482][0m
+[0m[ INFO] [1492173166.179553539]: Found *potential* solution on 6 iteration, joint: [0.171091, ... logging to /home/jeroen/.ros/log/50f9f85e-210e-11e7-827f-18dbf2373904/roslaunch-E5570-31955.log
+Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+Done checking log file disk usage. Usage is <1GB.
+]2;/home/jeroen/ros/lasrobot_ws/src/descartes_tutorials/launch/robot.launch
+[1mstarted roslaunch server http://localhost:45413/[0m
+
+SUMMARY
+========
+
+PARAMETERS
+ * /collisionChecking: True
+ * /local_path: /home/jeroen/ros/...
+ * /readTrajectoryFile: False
+ * /rosdistro: indigo
+ * /rosversion: 1.11.21
+ * /useWeldingCost: True
+ * /weldingCostWeight: 10.0
+ * /weldingSpeed: 0.01
+ * /workObjectID: tube_on_plate
+ * /workObjectPath: /home/jeroen/ros/...
+ * /writeTrajectoryFile: True
+
+NODES
+  /
+    robot (descartes_tutorials/robot)
+
+[1mROS_MASTER_URI=http://localhost:11311[0m
+]2;/home/jeroen/ros/lasrobot_ws/src/descartes_tutorials/launch/robot.launch http://localhost:11311
+core service [/rosout] found
+[1mprocess[robot-1]: started with pid [31973][0m
+[robot-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+[1mdone[0m

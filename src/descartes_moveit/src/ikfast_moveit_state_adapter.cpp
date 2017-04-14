@@ -88,10 +88,23 @@ bool descartes_moveit::IkFastMoveitStateAdapter::getAllIK(const Eigen::Affine3d&
     return false;
   }
 
+  logInform("ikfast found %lu joint solutions", static_cast<unsigned long>(joint_results.size()));
+
   for (auto& sol : joint_results)
   {
     if (isValid(sol))
+    {
+      std::stringstream ss;
+      for(size_t i = 0; i < sol.size(); ++i)
+      {
+        if(i != 0)
+          ss << ",";
+        ss << sol[i];
+      }
+      std::string s = ss.str();
+      ROS_INFO_STREAM("Found joint solution: " << s);
       joint_poses.push_back(std::move(sol));
+    }
   }
 
   return joint_poses.size() > 0;
