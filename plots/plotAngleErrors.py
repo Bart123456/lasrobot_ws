@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 # read error of simulation with custom cost function
 #~ bag = rosbag.Bag('L_profile_with_weldingcost.bag')
 bag = rosbag.Bag('L_profile_costweight_01.bag')
+#~ bag = rosbag.Bag('circle.bag')
 errorsX = []
 errorsY = []
 points1 = []
@@ -74,5 +75,5 @@ plt.ylabel(r'Deviation $|\gamma_p - \gamma_{ee}|$ [rad]', fontsize=20)
 plt.xlabel('Time [s]', fontsize=18)
 plt.axis([0, 40, 0, 1])
 plt.legend(['Improved cost function', 'Standard cost function'], fontsize=18)
-#~ plt.show()
-plt.savefig("compare_cost_functions.png", fontsize=18)
+plt.show()
+#~ plt.savefig("compare_cost_functions.png", fontsize=18)
