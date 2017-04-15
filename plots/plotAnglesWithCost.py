@@ -66,7 +66,7 @@ plt.xlabel('Time [s]', fontsize=18)
 plt.ylabel('Joint angles [rad]', fontsize=18)
 plt.axis([0, 40, -0.5, 2.5])
 
-#~ plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
+plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
 
 plt.savefig("joint_angles_with_cost.png")
 #~ plt.show()
