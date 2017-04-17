@@ -71,7 +71,7 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 # create plot
 plt.plot(time1, errorsY, 'k', time2, errorsYnocost, 'k--', linewidth=2.0)
-plt.ylabel(r'Deviation $|\gamma_p - \gamma_{ee}|$ [rad]', fontsize=20)
+plt.ylabel(r'Deviation $|\beta_p - \beta_{ee}|$ [rad]', fontsize=20)
 plt.xlabel('Time [s]', fontsize=18)
 plt.axis([0, 40, 0, 1])
 plt.legend(['Improved cost function', 'Standard cost function'], fontsize=18)
