@@ -27,6 +27,13 @@ namespace utilities {
 }
 
 namespace poseGeneration {
+	/**
+	* Get a vector of poses on a straight line between two points.
+	* @param startPose Transformation matrix of the starting pose
+	* @param endPose Transformation matrix of the end pose
+	* @param steps Number of trajectory points on straight line
+	* @return Vector containing the points of the line trajectory
+	*/
 	std::vector<Eigen::Affine3d> straightLine(	Eigen::Affine3d startPose,
 												Eigen::Affine3d endPose,
 												int steps);
