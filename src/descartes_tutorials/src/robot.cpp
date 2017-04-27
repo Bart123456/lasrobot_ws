@@ -158,16 +158,20 @@ int main(int argc, char** argv)
   trajvis::visualizedTrajectory trajectory;
 
   //Welding workobject
-  Eigen::Vector3d objectscale(0.001,0.001,0.001);
+  double objectscaleX, objectscaleY, objectscaleZ;
+  objectscaleX = 0.001;
+  objectscaleY = 0.001;
+  objectscaleZ = 0.001;
+  Eigen::Vector3d objectscale(objectscaleX,objectscaleY,objectscaleZ);
+ 
   Eigen::Affine3d objectpose;
-  
   double objectX, objectY, objectZ, objectrX, objectrY, objectrZ;
-  objectX = 0.8;
-  objectY = 0.0;
-  objectZ = 0.112;
+  objectX = 1.3-0.3;
+  objectY = -0.33; //0.33
+  objectZ = 0.112+0.4;
   objectrX = 0.0;
   objectrY = 0.0;
-  objectrZ = 0.0;
+  objectrZ = (M_PI)/2;
 
   moveit_msgs::PlanningScene planning_scene;
   if(!readTrajectoryFile)
@@ -219,9 +223,19 @@ int main(int argc, char** argv)
 
   //Define Poses
   std::vector<Eigen::Affine3d> poses;
-  Eigen::Affine3d centerPose;
-  centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
+  std::vector<Eigen::Affine3d> subposes;
+  Eigen::Affine3d startPose;
+  Eigen::Affine3d endPose;
+
+  startPose = descartes_core::utils::toFrame(objectX+0.028, objectY+0.185+0.3, objectZ + 0.005, -2.35614675 , 0, -3.141529/2, descartes_core::utils::EulerConventions::XYZ);
+  endPose = descartes_core::utils::toFrame(objectX+0.061 ,objectY+0.185+0.3, objectZ + 0.005, 0, 0, 0, descartes_core::utils::EulerConventions::XYZ);
+  subposes = poseGeneration::straightLine( startPose, endPose,10);
+  poses.insert( poses.end(), subposes.begin(), subposes.end() );
+
+  //startPose = descartes_core::utils::toFrame(objectX+0.028, objectY-0.185, objectZ + 0.005, M_PI ,M_PI_4, 0, descartes_core::utils::EulerConventions::XYZ);
+  //endPose = descartes_core::utils::toFrame(objectX+0.028, objectY-0.185 + 0.035, objectZ + 0.005, 0, 0, 0, descartes_core::utils::EulerConventions::XYZ);
+  //subposes = poseGeneration::straightLine( startPose, endPose,10);
+ // poses.insert( poses.end(), subposes.begin(), subposes.end() );
 
   int tempSize;
   tempSize = poses.size();
@@ -239,10 +253,10 @@ int main(int argc, char** argv)
   }
 
   //Define tolerance sizes
-  trajectory.setRotStepSize(M_PI/180);
+  trajectory.setRotStepSize(5*M_PI/180);
   double rxTolerance, ryTolerance, rzTolerance;
-  rxTolerance = 0; //M_PI/36;
-  ryTolerance = 0; //M_PI/36;
+  rxTolerance = 40*M_PI/36;
+  ryTolerance = 40*M_PI/36;
   rzTolerance = 2*M_PI;
 
   for(int i = 0; i < tempSize; ++i)
