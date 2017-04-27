@@ -218,6 +218,7 @@ int main(int argc, char** argv)
   }
 
   //Define Poses
+  
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
@@ -247,8 +248,8 @@ int main(int argc, char** argv)
 
   for(int i = 0; i < tempSize; ++i)
   {
-    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
-    //trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
+    //trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+    trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
   }
 
   std::vector<double> trajectoryDistances;
