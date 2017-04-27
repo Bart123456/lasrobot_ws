@@ -222,6 +222,7 @@ int main(int argc, char** argv)
   }
 
   //Define Poses
+  
   std::vector<Eigen::Affine3d> poses;
   std::vector<Eigen::Affine3d> subposes;
   Eigen::Affine3d startPose;
@@ -261,8 +262,8 @@ int main(int argc, char** argv)
 
   for(int i = 0; i < tempSize; ++i)
   {
-    trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
-    //trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
+    //trajectory.addPoint(poses[i], trajvis::AxialSymmetricPoint);
+    trajectory.addTolerancedPoint(poses[i], rxTolerance, ryTolerance, rzTolerance);
   }
 
   std::vector<double> trajectoryDistances;
