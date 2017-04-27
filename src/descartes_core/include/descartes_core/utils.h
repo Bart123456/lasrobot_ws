@@ -90,10 +90,10 @@ static Eigen::Affine3d toFrame(double tx, double ty, double tz, double rx, doubl
 }
 
 // Use a function declaration so that we can add the 'unused' attribute, which prevents compiler warnings
-static Eigen::Affine3d toLocalFrame(double tx, double ty, double tz, double rx, double ry, double rz,
+static Eigen::Affine3d toLocalFrame(Eigen::Affine3d localFrame, double tx, double ty, double tz, double rx, double ry, double rz,
                                     int convention = int(EulerConventions::ZYX)) __attribute__((unused));
 
-static Eigen::Affine3d toLocalFrame(double tx, double ty, double tz, 
+static Eigen::Affine3d toLocalFrame(Eigen::Affine3d localFrame, double tx, double ty, double tz, 
                                     double rx, double ry, double rz, int convention)
 {
   Eigen::Affine3d rtn;
@@ -112,6 +112,7 @@ static Eigen::Affine3d toLocalFrame(double tx, double ty, double tz,
   switch (convention)
   {
     case EulerConventions::XYZ:
+      //zVector = Eigen::AngleAxisd(rx, xVector) * Eigen::AngleAxisd(ry, yVector) * zVector;
       rtn = Eigen::Translation3d(tx, ty, tz) * Eigen::AngleAxisd(rx, xVector) *
             Eigen::AngleAxisd(ry, yVector) * Eigen::AngleAxisd(rz, zVector);
       break;

@@ -61,9 +61,9 @@ EigenSTL::vector_Affine3d uniform(const TolerancedFrame &frame, const double ori
 
   if (orient_increment > 0)
   {
-    nrx = ((frame.orientation_tolerance.x_upper - frame.orientation_tolerance.x_lower) / orient_increment) + 1;
-    nry = ((frame.orientation_tolerance.y_upper - frame.orientation_tolerance.y_lower) / orient_increment) + 1;
-    nrz = ((frame.orientation_tolerance.z_upper - frame.orientation_tolerance.z_lower) / orient_increment) + 1;
+    nrx = ((frame.orientation_tolerance.x_rel_upper - frame.orientation_tolerance.x_rel_lower) / orient_increment) + 1;
+    nry = ((frame.orientation_tolerance.y_rel_upper - frame.orientation_tolerance.y_rel_lower) / orient_increment) + 1;
+    nrz = ((frame.orientation_tolerance.z_rel_upper - frame.orientation_tolerance.z_rel_lower) / orient_increment) + 1;
   }
   else
   {
@@ -95,29 +95,30 @@ EigenSTL::vector_Affine3d uniform(const TolerancedFrame &frame, const double ori
 
   for (size_t ii = 0; ii < nrx; ++ii)
   {
-    rx = frame.orientation_tolerance.x_lower + orient_increment * ii;
+    rx = frame.orientation_tolerance.x_rel_lower + orient_increment * ii;
     for (size_t jj = 0; jj < nry; ++jj)
     {
-      ry = frame.orientation_tolerance.y_lower + orient_increment * jj;
+      ry = frame.orientation_tolerance.y_rel_lower + orient_increment * jj;
       for (size_t kk = 0; kk < nrz; ++kk)
       {
-        rz = frame.orientation_tolerance.z_lower + orient_increment * kk;
+        rz = frame.orientation_tolerance.z_rel_lower + orient_increment * kk;
         for (size_t ll = 0; ll < ntx; ++ll)
         {
-          tx = frame.position_tolerance.x_lower + pos_increment * ll;
+          tx = frame.position_tolerance.x_rel_lower + pos_increment * ll;
           for (size_t mm = 0; mm < nty; ++mm)
           {
-            ty = frame.position_tolerance.y_lower + pos_increment * mm;
+            ty = frame.position_tolerance.y_rel_lower + pos_increment * mm;
             for (size_t nn = 0; nn < ntz; ++nn)
             {
-              tz = frame.position_tolerance.z_lower + pos_increment * nn;
+              tz = frame.position_tolerance.z_rel_lower + pos_increment * nn;
 
               /*              sampled_frame = Eigen::Translation3d(tx,ty,tz) *
                                 Eigen::AngleAxisd(rx, Eigen::Vector3d::UnitX()) *
                                 Eigen::AngleAxisd(ry, Eigen::Vector3d::UnitY()) *
                                 Eigen::AngleAxisd(rz, Eigen::Vector3d::UnitZ());*/
               sampled_frame =
-                  descartes_core::utils::toLocalFrame(tx, ty, tz, rx, ry, rz, descartes_core::utils::EulerConventions::XYZ);
+                  descartes_core::utils::toLocalFrame(frame.frame, tx, ty, tz, rx, ry, rz, descartes_core::utils::EulerConventions::XYZ);
+              sampled_frame = frame.frame * sampled_frame;
               rtn.push_back(sampled_frame);
             }
           }
