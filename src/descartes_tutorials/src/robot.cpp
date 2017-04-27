@@ -256,8 +256,8 @@ int main(int argc, char** argv)
   //Define tolerance sizes
   trajectory.setRotStepSize(5*M_PI/180);
   double rxTolerance, ryTolerance, rzTolerance;
-  rxTolerance = 40*M_PI/36;
-  ryTolerance = 40*M_PI/36;
+  rxTolerance = 0;//M_PI/36;
+  ryTolerance = 0;//40*M_PI/36;
   rzTolerance = 2*M_PI;
 
   for(int i = 0; i < tempSize; ++i)
