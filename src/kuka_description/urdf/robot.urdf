@@ -25,20 +25,24 @@
     <color rgba="1 1 0 1"/>
 </material>
 
+<material name="orange">
+    <color rgba="1 0.5 0 1"/>
+</material>
+
 <!--__________________________LINKS_____________________________________________________-->
 	<link name="base_link"> 
  		<visual> 
     		<origin xyz="0 0 0" rpy="0 0 0" /> 
     		<geometry> 
-      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Base.stl" 
+      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Baseb.stl" 
 				scale=".001 .001 .001"/> 
       		</geometry> 
-			<material name ="red"/>
+			<material name ="orange"/>
  		</visual> 
  		<collision> 
     		<origin xyz="0 0 0" rpy="0 0 0" /> 
     		<geometry> 
-      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Base.stl" 
+      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Baseb.stl" 
 				scale=".001 .001 .001"/> 
       		</geometry> 
  		</collision> 
@@ -46,33 +50,33 @@
 
 	<link name="link1"> 
  		<visual> 
-   			<origin xyz="0 0 -0.225" rpy="0 0 0" /> 
+   			<origin xyz="-0.0014 -0.003 0.018" rpy="0 0 3.141529" /> 
     		<geometry> 
-      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1.stl" 
-				scale=".001 .001 .001"/> 
+      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1c.stl" 
+				scale=".004 .004 .004"/> 
       		</geometry> 
-			<material name ="yellow"/>
+			<material name ="orange"/>
  		</visual> 
  		<collision> 
-    		<origin xyz="0 0 -0.225" rpy="0 0 0" /> 
+    		<origin xyz="-0.0014 -0.003 0.018" rpy="0 0 3.141529" /> 
     		<geometry> 
-      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1.stl" 
-				scale=".001 .001 .001"/> 
+      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1c.stl" 
+				scale=".004 .004 .004"/> 
       		</geometry> 
  		</collision> 
 	</link>
 
 	<link name="link2"> 
  		<visual> 
-    		<origin xyz="-0.180 0 -0.400" rpy="0 0 0" /> 
+    		<origin xyz="-0.18742 0 -0.400" rpy="0 0 0" /> 
     		<geometry> 
       			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link2.stl" 
 				scale=".001 .001 .001"/> 
       		</geometry> 
-			<material name ="green"/>
+			<material name ="orange"/>
  		</visual> 
  		<collision> 
-    		<origin xyz="-0.180 0 -0.400" rpy="0 0 0" /> 
+    		<origin xyz="-0.18742 0 -0.400" rpy="0 0 0" /> 
     		<geometry> 
       			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link2.stl" 
 				scale=".001 .001 .001"/> 
@@ -87,7 +91,7 @@
       			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link3.stl" 
 				scale=".001 .001 .001"/> 
       		</geometry> 
-			<material name ="blue"/>
+			<material name ="orange"/>
  		</visual> 
  		<collision> 
     		<origin xyz="-0.180 0 -1.0" rpy="0 0 0" /> 
@@ -105,7 +109,7 @@
       			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link4.stl" 
 				scale=".001 .001 .001"/> 
       		</geometry>
-			<material name ="red"/> 
+			<material name ="orange"/> 
  		</visual> 
  		<collision> 
     		<origin xyz="-0.5835 0 -1.12" rpy="0 0 0" /> 
@@ -123,7 +127,7 @@
       			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link5.stl" 
 				scale=".001 .001 .001"/> 
       		</geometry> 
-			<material name ="yellow"/>
+			<material name ="orange"/>
  		</visual> 
  		<collision> 
     		<origin xyz="-0.800 0 -1.12" rpy="0 0 0" /> 
@@ -141,7 +145,7 @@
      			 <mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link6.stl" 
 				scale=".001 .001 .001"/> 
       		</geometry> 
-			<material name ="green"/>
+			<material name ="orange"/>
      	</visual> 
  		<collision> 
     		<origin xyz="-0.9088 0 -1.12" rpy="0 0 0" /> 
@@ -159,7 +163,7 @@
       			<mesh filename="package://kuka_description/meshes/Welding_Torch/Assembly4_origin_tip3.stl" 
 				scale=".01 .01 .01"/> 
       		</geometry> 
-			<material name ="blue"/>
+			<material name ="orange"/>
  		</visual> 
  		<collision> 
     		<origin xyz="0 0 0" rpy="0 0 0" /> 
