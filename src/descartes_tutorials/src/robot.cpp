@@ -218,11 +218,19 @@ int main(int argc, char** argv)
   }
 
   //Define Poses
-  
+  /*
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d centerPose;
   centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
   poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
+  */
+  std::vector<Eigen::Affine3d> poses;
+  Eigen::Affine3d startPose;
+  Eigen::Affine3d endPose;
+  startPose = descartes_core::utils::toFrame(objectX, objectY + 0.025, objectZ + 0.025, (M_PI / 2) + M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
+  endPose = descartes_core::utils::toFrame(objectX + 0.4, objectY + 0.025, objectZ + 0.025, (M_PI / 2) + M_PI/4, 0, -M_PI/2, descartes_core::utils::EulerConventions::XYZ);
+
+  poses = poseGeneration::straightLine(startPose, endPose, 50);
 
   int tempSize;
   tempSize = poses.size();
@@ -240,11 +248,18 @@ int main(int argc, char** argv)
   }
 
   //Define tolerance sizes
-  trajectory.setRotStepSize(M_PI/180);
+  double rotStepSize = M_PI/180;
+  trajectory.setRotStepSize(rotStepSize);
   double rxTolerance, ryTolerance, rzTolerance;
   rxTolerance = 0; //M_PI/36;
   ryTolerance = 0; //M_PI/36;
-  rzTolerance = 2*M_PI;
+  rzTolerance = M_PI;
+
+  //Define secondary tolerances
+  double rx_sec, ry_sec, rz_sec;
+  rx_sec = 0;
+  ry_sec = M_PI/5;
+  rz_sec = M_PI;
 
   for(int i = 0; i < tempSize; ++i)
   {
@@ -336,10 +351,24 @@ int main(int argc, char** argv)
   {
     // 4. Feed the trajectory to the planner
     double planningStart = ros::Time::now().toSec();
-    if (!planner.planPath(points))
+    bool continuePlanning = true;
+    while(continuePlanning)
     {
-      ROS_ERROR("Could not solve for a valid path");
-      return -2;
+      if (!planner.planPath(points))
+      {
+        if(planner.getErrorCode() == -1)
+        {
+          descartes_core::TrajectoryPt::ID failedID = planner.getPlanningGraph().getFailedID();
+          ROS_ERROR_STREAM("Robotplanner failed with: " << failedID << ", updating tolerances.");
+          points[failedID.value() - 1] = utilities::makeTolerancedCartesianPoint(poses[failedID.value()], rx_sec, ry_sec, rz_sec, rotStepSize);
+        } else {
+          ROS_ERROR("Could not solve for a valid path");
+          continuePlanning = false;
+          return -2;
+        }
+      } else {
+        continuePlanning = false;
+      }
     }
 
     double planningEnd = ros::Time::now().toSec();

@@ -853,6 +853,7 @@ bool PlanningGraph::calculateJointSolutions(const std::vector<TrajectoryPtPtr>& 
     if (joint_poses.empty())
     {
       ROS_ERROR_STREAM(__FUNCTION__ << ": IK failed for input trajectory point with ID = " << points[i]->getID());
+      failedID = points[i]->getID();
       return false;
     }
 

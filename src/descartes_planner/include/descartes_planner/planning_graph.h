@@ -165,6 +165,11 @@ public:
     weldingCostFactor = newFactor;
   }
 
+  descartes_core::TrajectoryPt::ID getFailedID()
+  {
+    return failedID;
+  }
+
 protected:
   descartes_core::RobotModelConstPtr robot_model_;
 
@@ -175,6 +180,8 @@ protected:
   bool useWeldingCost = true;
 
   double weldingCostFactor = 1.0;
+
+  descartes_core::TrajectoryPt::ID failedID;
 
   int recalculateJointSolutionsVertexMap(
       std::map<descartes_core::TrajectoryPt::ID, JointGraph::vertex_descriptor> &joint_vertex_map) const;

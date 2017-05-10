@@ -143,6 +143,51 @@ namespace utilities {
 		yErrors.push_back(yRotation);
 	}
 
+	descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, 
+																	double transY, 
+																	double transZ, 
+																	double rotX, 
+																	double rotY, 
+																	double rotZ,
+																	double rotStepSize)
+	{
+		using namespace descartes_core;
+		using namespace descartes_trajectory;
+		Eigen::Affine3d pose = utils::toFrame(transX, transY, transZ, rotX, rotY, rotZ, utils::EulerConventions::XYZ);
+	
+		//Works
+		descartes_trajectory::PositionTolerance p;
+		p = ToleranceBase::zeroTolerance<PositionTolerance>(transX, transY, transZ);
+		descartes_trajectory::OrientationTolerance o;
+		o = ToleranceBase::createSymmetric<OrientationTolerance>(rotX, rotY, rotZ, 0, 0, 2*M_PI);
+		return TrajectoryPtPtr( new CartTrajectoryPt( TolerancedFrame(pose, p, o), 0.0, rotStepSize) );
+	}
+
+	descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(Eigen::Affine3d pose, double rxTolerance, double ryTolerance, double rzTolerance, double rotStepSize)
+	{
+		using namespace descartes_core;
+		using namespace descartes_trajectory;
+
+		Eigen::Vector3d translations;
+		translations = pose.translation();
+		Eigen::Vector3d eulerXYZ;
+		eulerXYZ = pose.rotation().eulerAngles(0,1,2);
+
+		descartes_trajectory::PositionTolerance p;
+		p = ToleranceBase::zeroTolerance<PositionTolerance>(translations(0), translations(1), translations(2));
+		descartes_trajectory::OrientationTolerance o;
+		o = ToleranceBase::createSymmetric<OrientationTolerance>(eulerXYZ(0), eulerXYZ(1), eulerXYZ(2), rxTolerance, ryTolerance, rzTolerance);
+		return TrajectoryPtPtr( new CartTrajectoryPt( TolerancedFrame(pose, p, o), 0.0, rotStepSize) );
+	}
+
+	descartes_core::TrajectoryPtPtr makeAxialSymmetricPoint(	double x, double y, double z, double rx, double ry,
+																					double rz, double rotStepSize)
+	{
+		using namespace descartes_core;
+		using namespace descartes_trajectory;
+		return TrajectoryPtPtr( new AxialSymmetricPt(x, y, z, rx, ry, rz, rotStepSize, AxialSymmetricPt::Z_AXIS) );
+	}
+
 } //Namespace utilities
 
 namespace poseGeneration {

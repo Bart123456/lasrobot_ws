@@ -3,6 +3,8 @@
 #include <moveit_msgs/PlanningScene.h>
 #include <moveit_msgs/CollisionObject.h>
 #include <std_msgs/ColorRGBA.h>
+#include <descartes_trajectory/axial_symmetric_pt.h>
+#include <descartes_trajectory/cart_trajectory_pt.h>
 
 namespace utilities {
     //Function for constructing quaternion starting from Euler rotations XYZ
@@ -24,6 +26,20 @@ namespace utilities {
 	moveit_msgs::ObjectColor makeObjectColor(std::string id, double r, double g, double b, double a);
 
 	void computeAngleErrors(Eigen::Affine3d referencePose, Eigen::Affine3d pose, std::vector<double>& xErrors, std::vector<double>& yErrors);
+
+	//Generates a toleranced cartesian point from a pose
+	descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(	double transX, 
+																	double transY, 
+																	double transZ, 
+																	double rotX, 
+																	double rotY, 
+																	double rotZ,
+																	double rotStepSize);
+
+	descartes_core::TrajectoryPtPtr makeTolerancedCartesianPoint(Eigen::Affine3d pose, double rxTolerance, double ryTolerance, double rzTolerance, double rotStepSize);
+	
+	//Generates a cartesian point with free rotation about the Z axis of the EFF frame
+	descartes_core::TrajectoryPtPtr makeAxialSymmetricPoint(double x, double y, double z, double rx, double ry, double rz, double rotStepSize);
 }
 
 namespace poseGeneration {
