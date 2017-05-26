@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # read bag cylinder A
 # ===================
-bag = rosbag.Bag('L_profile_without_weldingcost.bag')
+bag = rosbag.Bag('noCost.bag')
 points = []
 for topic, msg, t in bag.read_messages(topics=['trajectory']):
     points = msg.points
@@ -25,7 +25,7 @@ bag.close()
 # read bag l profile B
 # ====================
 #~ bagB = rosbag.Bag('L_profile_with_weldingcost.bag')
-bagB = rosbag.Bag('L_profile_costweight_01.bag')
+bagB = rosbag.Bag('noCost.bag')
 points = []
 for topic, msg, t in bagB.read_messages(topics=['trajectory']):
     points = msg.points
@@ -61,12 +61,12 @@ plt.figure(figsize=(8, 6))
 #~ plt.subplot(122)
 for i in range(0, 6):
 	plt.plot(tB, jB[i], '.-')
-plt.title("Task B: L-profile with cost function", fontsize=18)
-plt.xlabel('Time [s]', fontsize=18)
-plt.ylabel('Joint angles [rad]', fontsize=18)
+plt.title("Zonder kostenfunctie", fontsize=18)
+plt.xlabel('Tijd [s]', fontsize=18)
+plt.ylabel('Joint hoeken [rad]', fontsize=18)
 plt.axis([0, 40, -0.5, 2.5])
 
 plt.legend(['Joint 1', 'Joint 2', 'Joint 3', 'Joint 4', 'Joint 5', 'Joint 6'])
 
-plt.savefig("joint_angles_with_cost.png")
+plt.savefig("noCost.png")
 #~ plt.show()

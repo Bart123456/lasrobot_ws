@@ -162,12 +162,12 @@ int main(int argc, char** argv)
   Eigen::Affine3d objectpose;
   
   double objectX, objectY, objectZ, objectrX, objectrY, objectrZ;
-  objectX = 0.8;
-  objectY = 0.0;
+  objectX = 1.2;
+  objectY = -0.2;
   objectZ = 0.112;
   objectrX = 0.0;
   objectrY = 0.0;
-  objectrZ = 0.0;
+  objectrZ = M_PI_2;
 
   moveit_msgs::PlanningScene planning_scene;
   if(!readTrajectoryFile)
@@ -220,9 +220,12 @@ int main(int argc, char** argv)
   //Define Poses
   
   std::vector<Eigen::Affine3d> poses;
-  Eigen::Affine3d centerPose;
-  centerPose = descartes_core::utils::toFrame(objectX, objectY, objectZ + 0.014, objectrX, -(M_PI / 2), objectrZ, descartes_core::utils::EulerConventions::XYZ);
-  poses = poseGeneration::circle(centerPose, 0.054, 30, -(M_PI / 4), 2 * M_PI);
+  Eigen::Affine3d startPose;
+  Eigen::Affine3d endPose;
+  startPose = descartes_core::utils::toFrame(objectX-0.02, objectY , objectZ + 0.02, 0, (M_PI / 2) + M_PI/4, 0, descartes_core::utils::EulerConventions::XYZ);
+  endPose = descartes_core::utils::toFrame(objectX -0.02, objectY + 0.4, objectZ + 0.02, 0, 0, 0, descartes_core::utils::EulerConventions::XYZ);
+
+  poses = poseGeneration::straightLine(startPose, endPose, 10);
 
   int tempSize;
   tempSize = poses.size();
@@ -240,10 +243,10 @@ int main(int argc, char** argv)
   }
 
   //Define tolerance sizes
-  trajectory.setRotStepSize(M_PI/180);
+  trajectory.setRotStepSize(5*M_PI/180);
   double rxTolerance, ryTolerance, rzTolerance;
   rxTolerance = 0; //M_PI/36;
-  ryTolerance = 0; //M_PI/36;
+  ryTolerance = 50*(M_PI/180); //M_PI/36;
   rzTolerance = 2*M_PI;
 
   for(int i = 0; i < tempSize; ++i)

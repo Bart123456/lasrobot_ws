@@ -52,7 +52,7 @@
  		<visual> 
    			<origin xyz="-0.0014 -0.003 0.018" rpy="0 0 3.141529" /> 
     		<geometry> 
-      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1c.stl" 
+      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1b.stl" 
 				scale=".004 .004 .004"/> 
       		</geometry> 
 			<material name ="orange"/>
@@ -60,7 +60,7 @@
  		<collision> 
     		<origin xyz="-0.0014 -0.003 0.018" rpy="0 0 3.141529" /> 
     		<geometry> 
-      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1c.stl" 
+      			<mesh filename="package://kuka_description/meshes/kuka_kr5_arc/visual/Link1b.stl" 
 				scale=".004 .004 .004"/> 
       		</geometry> 
  		</collision> 

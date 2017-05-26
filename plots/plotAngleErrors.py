@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # read error of simulation with custom cost function
 #~ bag = rosbag.Bag('L_profile_with_weldingcost.bag')
-bag = rosbag.Bag('L_profile_costweight_01.bag')
+bag = rosbag.Bag('1.bag')
 #~ bag = rosbag.Bag('circle.bag')
 errorsX = []
 errorsY = []
@@ -25,19 +25,18 @@ for point in points1:
 bag.close()
 
 # read error of simulation with standard cost function
-bag2 = rosbag.Bag('L_profile_without_weldingcost.bag')
+bag2 = rosbag.Bag('1.bag')
 errorsYnocost = []
 points2 = []
 for topic, msg, t in bag2.read_messages(topics=['angleErrorsY', 'trajectory']):
 	if topic == 'angleErrorsY':
 		errorsYnocost = msg.data
-		
 	if topic == 'trajectory':
 		points2 = msg.points
 		
 time2 = []
 for point in points2:
-	time2.append(point.time_from_start.secs + point.time_from_start.nsecs / 1e9)
+	time2.append(point.time_from_start.secs + point.time_from_start.nsecs/ 1e9)
 		
 bag2.close()
 
@@ -74,6 +73,6 @@ plt.plot(time1, errorsY, 'k', time2, errorsYnocost, 'k--', linewidth=2.0)
 plt.ylabel(r'Deviation $|\beta_p - \beta_{ee}|$ [rad]', fontsize=20)
 plt.xlabel('Time [s]', fontsize=18)
 plt.axis([0, 40, 0, 1])
-plt.legend(['Improved cost function', 'Standard cost function'], fontsize=18)
+plt.legend(['zonder kostenfunctie', 'met kostenfunctie'], fontsize=18)
 plt.show()
 #~ plt.savefig("compare_cost_functions.png", fontsize=18)

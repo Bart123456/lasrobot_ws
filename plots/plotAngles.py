@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 # read bag cylinder A
 # ===================
-bag = rosbag.Bag('cylinder_IKfast_100pt.bag')
+bag = rosbag.Bag('noCost.bag')
 points = []
 for topic, msg, t in bag.read_messages(topics=['trajectory']):
     points = msg.points
@@ -24,7 +24,7 @@ bag.close()
 
 # read bag l profile B
 # ====================
-bagB = rosbag.Bag('L_profile_without_weldingcost.bag')
+bagB = rosbag.Bag('noCost.bag')
 points = []
 for topic, msg, t in bagB.read_messages(topics=['trajectory']):
     points = msg.points
@@ -68,5 +68,5 @@ plt.xlabel('Time [s]', fontsize=18)
 # avoid the x-label from being cut off
 plt.gcf().subplots_adjust(bottom=0.15)
 
-#~ plt.savefig("joint_angles_AB2.png")
+#~ plt.savefig("noCost.png")
 plt.show()
