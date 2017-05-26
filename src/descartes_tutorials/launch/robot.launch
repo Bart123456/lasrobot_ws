@@ -6,7 +6,7 @@
   <param name="readTrajectoryFile" value="false"/>
   <param name="writeTrajectoryFile" value="true"/>
   <param name="collisionChecking" value="true"/>
-  <param name="useWeldingCost" value="false"/>
+  <param name="useWeldingCost" value="true"/>
   <param name="weldingCostWeight" value="10.0"/>
   <param name="weldingSpeed" value="0.01"/> <!-- Speed in m/s-->
   <param name="workObjectPath" value="$(find descartes_tutorials)/Scenarios/Meshes/testcaseRobberechts.stl"/>
