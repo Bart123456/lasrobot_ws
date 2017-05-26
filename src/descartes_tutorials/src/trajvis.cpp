@@ -121,8 +121,8 @@ namespace trajvis{
 		marker.pose.orientation.z = quat.z();
 		marker.pose.orientation.w = quat.w();
 		marker.scale.x = 0.02;
-		marker.scale.y = 0.004;
-		marker.scale.z = 0.004;
+		marker.scale.y = 0.003;
+		marker.scale.z = 0.003;
 		marker.color.a = 1.0;	//Alpha
 
 		count++;

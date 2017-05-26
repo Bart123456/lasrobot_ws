@@ -163,7 +163,7 @@ int main(int argc, char** argv)
   
   double objectX, objectY, objectZ, objectrX, objectrY, objectrZ;
   objectX = 1.2;
-  objectY = -0.2;
+  objectY = -0.33;
   objectZ = 0.112;
   objectrX = 0.0;
   objectrY = 0.0;
@@ -219,13 +219,21 @@ int main(int argc, char** argv)
 
   //Define Poses
   
+  std::vector<Eigen::Affine3d> posesFraction;
   std::vector<Eigen::Affine3d> poses;
   Eigen::Affine3d startPose;
   Eigen::Affine3d endPose;
-  startPose = descartes_core::utils::toFrame(objectX-0.02, objectY , objectZ + 0.02, 0, (M_PI / 2) + M_PI/4, 0, descartes_core::utils::EulerConventions::XYZ);
-  endPose = descartes_core::utils::toFrame(objectX -0.02, objectY + 0.4, objectZ + 0.02, 0, 0, 0, descartes_core::utils::EulerConventions::XYZ);
 
-  poses = poseGeneration::straightLine(startPose, endPose, 10);
+  startPose = descartes_core::utils::toFrame(objectX+0.076-0.01, objectY+0.500-0.012, objectZ + 0.017, -M_PI_2 - M_PI_4, 0, M_PI_2, descartes_core::utils::EulerConventions::XYZ);
+  endPose = descartes_core::utils::toFrame(objectX+0.076-0.015-0.03, objectY+0.500-0.02, objectZ + 0.017, 0, 0, 0, descartes_core::utils::EulerConventions::XYZ);
+  posesFraction = poseGeneration::straightLine(startPose, endPose, 10);
+  poses.insert(std::end(poses), std::begin(posesFraction), std::end(posesFraction));
+
+  startPose = descartes_core::utils::toFrame(objectX+0.076-0.015-0.03, objectY+0.500-0.02, objectZ + 0.017, 0, M_PI_2+M_PI_4, 0, descartes_core::utils::EulerConventions::XYZ);
+  endPose = descartes_core::utils::toFrame(objectX+0.076-0.015-0.03, objectY+0.500+0.03+0.01, objectZ + 0.017, 0, 0, 0, descartes_core::utils::EulerConventions::XYZ);
+  posesFraction = poseGeneration::straightLine(startPose, endPose, 10);
+  poses.insert(std::end(poses), std::begin(posesFraction), std::end(posesFraction));
+	
 
   int tempSize;
   tempSize = poses.size();
@@ -245,7 +253,7 @@ int main(int argc, char** argv)
   //Define tolerance sizes
   trajectory.setRotStepSize(5*M_PI/180);
   double rxTolerance, ryTolerance, rzTolerance;
-  rxTolerance = 0; //M_PI/36;
+  rxTolerance = 50*(M_PI/180); //M_PI/36;
   ryTolerance = 50*(M_PI/180); //M_PI/36;
   rzTolerance = 2*M_PI;
 
