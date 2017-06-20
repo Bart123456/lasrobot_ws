@@ -4,10 +4,10 @@ These are the generated trajectories used for the thesis of this research. To re
 <?xml version="1.0"?>
 <launch>
 
-  <!-- Path to save scene data-->
-  <param name="local_path" value="$(find descartes_tutorials)/Scenarios/Simulations_Thesis/<name_folder_with_bag_file>/<name_bag_file>.bag"/>     <!--[Changed the directory of the bag-file]-->
-  <param name="readTrajectoryFile" value="true"/>                                                                                                 <!--[Changed from false to true]-->
-  <param name="writeTrajectoryFile" value="false"/>                                                                                               <!--[Changed from true to false]-->
+  <!-- Path to save scene data--> <!--[Changed the directory of the bag-file]-->
+  <param name="local_path" value="$(find descartes_tutorials)/Scenarios/Simulations_Thesis/<name_folder_with_bag_file>/<name_bag_file>.bag"/>     
+  <param name="readTrajectoryFile" value="true"/>    <!--[Changed from false to true]-->                                                                                             
+  <param name="writeTrajectoryFile" value="false"/>  <!--[Changed from true to false]-->                                                                                            
   <param name="collisionChecking" value="true"/>
   <param name="useWeldingCost" value="true"/>
   <param name="weldingCostWeight" value="10.0"/>
