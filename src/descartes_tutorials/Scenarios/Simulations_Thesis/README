@@ -12,10 +12,10 @@ EXAMPLE:
 <?xml version="1.0"?>
 <launch>
 
-  <!-- Path to save scene data--> 
-  <param name="local_path" value="$(find descartes_tutorials)/Scenarios/Simulations_Thesis/TestcaseRB/TR_Cost.bag"/>     
-  <param name="readTrajectoryFile" value="true"/>                                                                                              
-  <param name="writeTrajectoryFile" value="false"/>                                                                                           
+  <!-- Path to save scene data-->
+  <param name="local_path" value="$(find descartes_tutorials)/Scenarios/Simulations_Thesis//TestcaseRB/TR_Cost.bag"/>
+  <param name="readTrajectoryFile" value="true"/>
+  <param name="writeTrajectoryFile" value="false"/>
   <param name="collisionChecking" value="true"/>
   <param name="useWeldingCost" value="true"/>
   <param name="weldingCostWeight" value="10.0"/>
