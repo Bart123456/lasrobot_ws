@@ -1,13 +1,21 @@
 These are the generated trajectories used for the thesis of this research. To replay the trajectories change the robot.launch file as following:
 
+CHANGES:
+
+-> Change the directory of the bag-file
+-> Change the parameter "readTrajectoryFile" to true
+-> Change the parameter "writeTrajectoryFile" to false
+
+
+EXAMPLE:
 
 <?xml version="1.0"?>
 <launch>
 
-  <!-- Path to save scene data--> <!--[Changed the directory of the bag-file]-->
-  <param name="local_path" value="$(find descartes_tutorials)/Scenarios/Simulations_Thesis/<name_folder_with_bag_file>/<name_bag_file>.bag"/>     
-  <param name="readTrajectoryFile" value="true"/>    <!--[Changed from false to true]-->                                                                                             
-  <param name="writeTrajectoryFile" value="false"/>  <!--[Changed from true to false]-->                                                                                            
+  <!-- Path to save scene data--> <
+  <param name="local_path" value="$(find descartes_tutorials)/Scenarios/Simulations_Thesis/TestcaseRB/TR_Cost.bag"/>     
+  <param name="readTrajectoryFile" value="true"/>                                                                                              
+  <param name="writeTrajectoryFile" value="false"/>                                                                                           
   <param name="collisionChecking" value="true"/>
   <param name="useWeldingCost" value="true"/>
   <param name="weldingCostWeight" value="10.0"/>
@@ -20,9 +28,10 @@ These are the generated trajectories used for the thesis of this research. To re
 </launch>
 
 
+INFO:
+
 First of all this will load the workobject and environnement which is saved in the opened bag-file. After that the robot will execute the stored
 trajectory. However the trajectorypoints themself have not been saved in the bag-files and thus wont be there. If you want the trajectory point 
 you will need to declare them yourself in the tutorial file (robot.cpp).
 
-
-NOTE: If not specified in the title, the simulation has been solved using the IKFast-solver.
+note: If not specified in the title, the simulation has been solved using the IKFast-solver.
