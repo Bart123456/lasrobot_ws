@@ -6,6 +6,8 @@ CHANGES:
 -> Change the parameter "readTrajectoryFile" to true
 -> Change the parameter "writeTrajectoryFile" to false
 
+The workObjectPath parameter in the launch file robot.launch is not used when the information is read from an existing bag file.
+
 
 EXAMPLE:
 
